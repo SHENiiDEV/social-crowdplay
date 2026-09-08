@@ -28,18 +28,13 @@ class AuthController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'game_balance' => 100.00, // 100 Welcome Coins
+            'game_balance' => 0.00,
             'referred_by' => $referrer ? $referrer->id : null,
         ]);
 
-        // Referral reward
-        if ($referrer) {
-            $referrer->increment('game_balance', 50.00); // 50 Bonus Coins to referrer
-        }
-
         Auth::login($user);
 
-        return redirect()->back()->with('success', 'Account created! Received 100 welcome coins.');
+        return redirect()->back()->with('success', 'Account created successfully!');
     }
 
     public function login(Request $request)

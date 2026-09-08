@@ -13,7 +13,7 @@ return new class extends Migration
                 $table->string('user_code')->nullable()->unique();
             }
             if (!Schema::hasColumn('users', 'balance')) {
-                $table->decimal('balance', 16, 2)->default(100.00);
+                $table->decimal('balance', 16, 2)->default(0.00);
             }
             if (!Schema::hasColumn('users', 'is_blocked')) {
                 $table->boolean('is_blocked')->default(false);

@@ -173,16 +173,12 @@ export default function AuthModal({ isOpen, onClose, mode = 'login' }) {
                                 </div>
                             </div>
 
-                            <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl text-[11px] text-amber-300">
-                                🎁 Instant Bonus: Get 100 free Social Coins upon registration!
-                            </div>
-
                             <button
                                 type="submit"
                                 disabled={registerForm.processing}
                                 className="w-full btn-gold py-3.5 rounded-xl text-sm font-bold shadow-lg shadow-amber-500/20 hover:scale-[1.02] transition-all disabled:opacity-50"
                             >
-                                {registerForm.processing ? 'Creating Account...' : 'Claim 100 Coins & Sign Up'}
+                                {registerForm.processing ? 'Creating Account...' : 'Create Account'}
                             </button>
 
                             <div className="text-center pt-2 text-xs text-slate-400">

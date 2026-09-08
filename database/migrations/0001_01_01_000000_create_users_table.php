@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->decimal('game_balance', 16, 2)->default(100.00); // 100 bonus coins on signup
+            $table->decimal('game_balance', 16, 2)->default(0.00);
             $table->string('referral_code', 16)->unique();
             $table->foreignId('referred_by')->nullable()->constrained('users')->nullOnDelete();
             $table->boolean('is_admin')->default(false);
