@@ -58,12 +58,18 @@
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 26px; background: #0b1021; border-radius: 12px; border: 1px solid #1e293b;">
                         <tr>
                             <td style="padding: 12px 16px; font-size: 12px; color: #64748b; border-bottom: 1px solid #1e293b;">Account Name:</td>
-                            <td style="padding: 12px 16px; font-size: 12px; color: #f8fafc; font-weight: bold; border-bottom: 1px solid #1e293b; text-align: right;">{{ $user->name }}</td>
+                            <td style="padding: 12px 16px; font-size: 12px; color: #f8fafc; font-weight: bold; border-bottom: 1px solid #1e293b; text-align: right;">{{ $user->name }} {{ $user->surname ?? '' }}</td>
                         </tr>
                         <tr>
                             <td style="padding: 12px 16px; font-size: 12px; color: #64748b; border-bottom: 1px solid #1e293b;">Email Address:</td>
                             <td style="padding: 12px 16px; font-size: 12px; color: #f8fafc; font-weight: bold; border-bottom: 1px solid #1e293b; text-align: right;">{{ $user->email }}</td>
                         </tr>
+                        @if(!empty($user->country))
+                        <tr>
+                            <td style="padding: 12px 16px; font-size: 12px; color: #64748b; border-bottom: 1px solid #1e293b;">Country:</td>
+                            <td style="padding: 12px 16px; font-size: 12px; color: #f8fafc; font-weight: bold; border-bottom: 1px solid #1e293b; text-align: right;">{{ $user->country }}</td>
+                        </tr>
+                        @endif
                         <tr>
                             <td style="padding: 12px 16px; font-size: 12px; color: #64748b;">Referral Code:</td>
                             <td style="padding: 12px 16px; font-size: 12px; color: #c084fc; font-family: monospace; font-weight: bold; text-align: right;">{{ $user->referral_code ?? 'N/A' }}</td>

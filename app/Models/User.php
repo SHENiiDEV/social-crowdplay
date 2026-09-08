@@ -13,8 +13,16 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'surname',
         'email',
         'password',
+        'phone',
+        'date_of_birth',
+        'street_address',
+        'city',
+        'country',
+        'postal_code',
+        'terms_accepted_at',
         'user_code',
         'game_balance',
         'referral_code',
@@ -35,6 +43,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'date_of_birth' => 'date',
+            'terms_accepted_at' => 'datetime',
             'game_balance' => 'float',
             'is_admin' => 'boolean',
             'is_blocked' => 'boolean',

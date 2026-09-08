@@ -6,8 +6,10 @@ Hello, {{ $user->name }}!
 Welcome to CrowdPlay! Your social gaming account has been successfully created and is ready to play.
 
 YOUR ACCOUNT DETAILS:
-- Name: {{ $user->name }}
+- Name: {{ $user->name }} {{ $user->surname ?? '' }}
 - Email: {{ $user->email }}
+@if(!empty($user->country))- Country: {{ $user->country }}
+@endif
 - Referral Code: {{ $user->referral_code ?? 'N/A' }}
 
 WHAT TO EXPLORE:

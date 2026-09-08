@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\CountryList;
 use App\Mail\ResetPasswordMail;
 use App\Mail\WelcomeRegistrationMail;
 use App\Models\User;
@@ -21,9 +22,21 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', Password::defaults()],
+            'name' => ['required', 'string', 'max:255'],
+            'surname' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:50'],
+            'date_of_birth' => ['required', 'date', 'before:today'],
+            'street_address' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
+            'country' => ['required', 'string', 'max:255', function ($attribute, $value, $fail) {
+                if (!CountryList::isAllowed((string) $value)) {
+                    $fail('Registration from the selected country is not supported.');
+                }
+            }],
+            'postal_code' => ['required', 'string', 'max:32'],
+            'terms' => ['accepted'],
             'ref' => ['nullable', 'string'],
         ]);
 
@@ -34,8 +47,16 @@ class AuthController extends Controller
 
         $user = User::create([
             'name' => $validated['name'],
-            'email' => $validated['email'],
+            'surname' => $validated['surname'],
+            'email' => strtolower(trim($validated['email'])),
             'password' => Hash::make($validated['password']),
+            'phone' => trim($validated['phone']),
+            'date_of_birth' => $validated['date_of_birth'],
+            'street_address' => trim($validated['street_address']),
+            'city' => trim($validated['city']),
+            'country' => trim($validated['country']),
+            'postal_code' => trim($validated['postal_code']),
+            'terms_accepted_at' => now(),
             'game_balance' => 0.00,
             'referred_by' => $referrer ? $referrer->id : null,
         ]);
