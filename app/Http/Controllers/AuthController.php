@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\WelcomeRegistrationMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
@@ -31,6 +34,12 @@ class AuthController extends Controller
             'game_balance' => 0.00,
             'referred_by' => $referrer ? $referrer->id : null,
         ]);
+
+        try {
+            Mail::to($user->email)->send(new WelcomeRegistrationMail($user));
+        } catch (\Throwable $e) {
+            Log::error('Failed to send welcome registration email: ' . $e->getMessage());
+        }
 
         Auth::login($user);
 

@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\DepositSuccessfulMail;
 use App\Models\DepositLog;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -77,6 +80,12 @@ class CashierController extends Controller
                     if ($user) {
                         $user->game_balance += $deposit->coins_received;
                         $user->save();
+
+                        try {
+                            Mail::to($user->email)->send(new DepositSuccessfulMail($user, $deposit, (float) $user->game_balance));
+                        } catch (\Throwable $e) {
+                            Log::error('Failed to send deposit confirmation email: ' . $e->getMessage());
+                        }
                     }
 
                     return response()->json([
