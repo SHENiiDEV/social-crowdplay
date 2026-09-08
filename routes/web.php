@@ -20,6 +20,9 @@ Route::post('/gold_api', [\App\Http\Controllers\GgrTransactionController::class,
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
 // Game Launch & Play
 Route::get('/game/{slug}', [GameController::class, 'play'])->name('game.play');
