@@ -36,11 +36,11 @@ return [
     ],
 
     'ggr' => [
-        'api_server' => env('GGR_API_SERVER', 'https://api.ggr-goldapi.com'),
-        'agent_code' => env('GGR_AGENT_CODE', 'crowdplay_agent'),
-        'agent_token' => env('GGR_AGENT_TOKEN', 'test_agent_token_41f5cc79'),
-        'agent_secret' => env('GGR_AGENT_SECRET', 'test_agent_secret_8371c59'),
-        'mock_mode' => env('GGR_MOCK_MODE', true),
+        'api_server' => env('GGR_API_SERVER', env('GGR_API_URL', 'https://api.nexusggr.dev')),
+        'agent_code' => env('GGR_AGENT_CODE', 'crowdplay'),
+        'agent_token' => env('GGR_AGENT_TOKEN', 'c9540f990614ec0e60efa22d4c5fe5fe'),
+        'agent_secret' => env('GGR_AGENT_SECRET', '7e49159d19c1db28e7f70966b1242606'),
+        'mock_mode' => env('GGR_MOCK_MODE', false),
     ],
 
 ];
