@@ -8,7 +8,10 @@ import { LiveFeed } from '../Components/Home/LiveFeed';
 import StoreModal from '../Components/Modals/StoreModal';
 import { JackpotWinModal } from '../Components/Modals/JackpotWinModal';
 import AuthModal from '../Components/AuthModal';
-import { Sparkles, Trophy, Flame, Shield, ArrowRight, Dices, Users, Filter, Heart } from 'lucide-react';
+import { 
+    Sparkles, Trophy, Flame, Shield, ArrowRight, Dices, Users, Filter, 
+    Heart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight 
+} from 'lucide-react';
 import { Badge } from '../Components/ui/badge';
 import { Button } from '../Components/ui/button';
 
@@ -24,6 +27,10 @@ export default function Home({ games = [], currentCategory = 'All', categories =
     const [favoriteIds, setFavoriteIds] = useState([]);
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [perPage, setPerPage] = useState(24);
+
     useEffect(() => {
         if (auth.user) {
             fetch('/api/favorites')
@@ -36,6 +43,11 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                 .catch(() => {});
         }
     }, [auth.user]);
+
+    // Reset pagination to page 1 on filter or search changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, selectedProvider, currentCategory, showOnlyFavorites]);
 
     const handleTriggerJackpot = async () => {
         try {
@@ -87,6 +99,39 @@ export default function Home({ games = [], currentCategory = 'All', categories =
         return matchesFavorites && matchesCategory && matchesProvider && matchesSearch;
     });
 
+    // Pagination calculations
+    const totalGames = filteredGames.length;
+    const totalPages = Math.max(1, Math.ceil(totalGames / perPage));
+    const startIndex = (currentPage - 1) * perPage;
+    const endIndex = Math.min(startIndex + perPage, totalGames);
+    const paginatedGames = filteredGames.slice(startIndex, endIndex);
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+            const el = document.getElementById('games-catalog');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    };
+
+    const getPageNumbers = () => {
+        const pages = [];
+        if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else {
+            if (currentPage <= 4) {
+                pages.push(1, 2, 3, 4, 5, '...', totalPages);
+            } else if (currentPage >= totalPages - 3) {
+                pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+            } else {
+                pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+            }
+        }
+        return pages;
+    };
+
     return (
         <MainLayout
             currentCategory={currentCategory}
@@ -114,13 +159,11 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                 onOpenStore={() => setIsStoreOpen(true)}
             />
 
-
-
             {/* Live Winners Feed Widget */}
             <LiveFeed />
 
             {/* Category & Provider Navigation Section */}
-            <div id="games-catalog" className="space-y-6 mb-8">
+            <div id="games-catalog" className="space-y-6 mb-8 scroll-mt-24">
                 {/* Category Pills Bar */}
                 <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 overflow-x-auto gap-3">
                     <div className="flex items-center gap-2">
@@ -143,50 +186,152 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                         })}
                     </div>
 
-                    <div className="hidden sm:flex items-center gap-2 text-xs font-black text-slate-400">
+                    <div className="hidden sm:flex items-center gap-2 text-xs font-black text-slate-400 whitespace-nowrap">
                         <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
-                        <span>{filteredGames.length} Available Games</span>
+                        <span>{totalGames} Available Games</span>
                     </div>
                 </div>
 
-                {/* Provider Filter Tabs */}
-                <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                    <span className="text-[11px] font-black uppercase text-slate-500 mr-2 flex items-center gap-1">
-                        <Filter className="w-3.5 h-3.5" />
-                        <span>Provider:</span>
-                    </span>
-                    {providers.map((prov) => {
-                        const isSelected = selectedProvider === prov;
-                        return (
-                            <button
-                                key={prov}
-                                onClick={() => setSelectedProvider(prov)}
-                                className={`px-3.5 py-1.5 rounded-xl text-[11px] font-extrabold uppercase tracking-wide transition-all ${
-                                    isSelected
-                                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-                                        : 'bg-slate-950/60 text-slate-400 border border-slate-800/60 hover:text-slate-200'
-                                }`}
-                            >
-                                {prov}
-                            </button>
-                        );
-                    })}
+                {/* Provider Filter Tabs & Per-Page Controls */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pb-2">
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                        <span className="text-[11px] font-black uppercase text-slate-500 mr-1 flex items-center gap-1">
+                            <Filter className="w-3.5 h-3.5" />
+                            <span>Provider:</span>
+                        </span>
+                        {providers.map((prov) => {
+                            const isSelected = selectedProvider === prov;
+                            return (
+                                <button
+                                    key={prov}
+                                    onClick={() => setSelectedProvider(prov)}
+                                    className={`px-3.5 py-1.5 rounded-xl text-[11px] font-extrabold uppercase tracking-wide transition-all ${
+                                        isSelected
+                                            ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
+                                            : 'bg-slate-950/60 text-slate-400 border border-slate-800/60 hover:text-slate-200'
+                                    }`}
+                                >
+                                    {prov}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {totalGames > 0 && (
+                        <div className="flex items-center gap-2 text-xs text-slate-400 ml-auto">
+                            <span className="text-[11px] font-bold text-slate-500">Per page:</span>
+                            {[16, 24, 32, 48].map((size) => (
+                                <button
+                                    key={size}
+                                    onClick={() => {
+                                        setPerPage(size);
+                                        setCurrentPage(1);
+                                    }}
+                                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                                        perPage === size
+                                            ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
+                                            : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                                    }`}
+                                >
+                                    {size}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
             {/* Game Cards Grid */}
-            {filteredGames.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {filteredGames.map((game, index) => (
-                        <GameCard
-                            key={game.id}
-                            game={game}
-                            index={index}
-                            isFavInitial={favoriteIds.includes(game.id)}
-                            onFavToggle={handleFavToggle}
-                            onOpenAuth={(mode) => setAuthModal({ open: true, mode })}
-                        />
-                    ))}
+            {paginatedGames.length > 0 ? (
+                <div className="space-y-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {paginatedGames.map((game, index) => (
+                            <GameCard
+                                key={game.id}
+                                game={game}
+                                index={index}
+                                isFavInitial={favoriteIds.includes(game.id)}
+                                onFavToggle={handleFavToggle}
+                                onOpenAuth={(mode) => setAuthModal({ open: true, mode })}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Interactive Pagination Bar */}
+                    {totalPages > 1 && (
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-slate-900/60 border border-slate-800 rounded-3xl backdrop-blur-sm shadow-xl">
+                            {/* Counter */}
+                            <div className="text-xs font-bold text-slate-400">
+                                Showing <span className="text-white font-extrabold">{startIndex + 1}</span> to{' '}
+                                <span className="text-white font-extrabold">{endIndex}</span> of{' '}
+                                <span className="text-amber-400 font-black">{totalGames}</span> games
+                            </div>
+
+                            {/* Page Controls */}
+                            <div className="flex items-center gap-1.5 flex-wrap justify-center">
+                                {/* First & Prev */}
+                                <button
+                                    onClick={() => handlePageChange(1)}
+                                    disabled={currentPage === 1}
+                                    className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                    title="First page"
+                                >
+                                    <ChevronsLeft className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-1"
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Prev</span>
+                                </button>
+
+                                {/* Numbered Pages */}
+                                {getPageNumbers().map((page, i) => {
+                                    if (page === '...') {
+                                        return (
+                                            <span key={`dots-${i}`} className="px-2 text-slate-500 font-bold select-none">
+                                                ...
+                                            </span>
+                                        );
+                                    }
+                                    const isActive = currentPage === page;
+                                    return (
+                                        <button
+                                            key={`page-${page}`}
+                                            onClick={() => handlePageChange(page)}
+                                            className={`min-w-[38px] h-[38px] rounded-xl text-xs font-black transition-all ${
+                                                isActive
+                                                    ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 scale-105'
+                                                    : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                                            }`}
+                                        >
+                                            {page}
+                                        </button>
+                                    );
+                                })}
+
+                                {/* Next & Last */}
+                                <button
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                    className="px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-1"
+                                >
+                                    <span className="hidden sm:inline">Next</span>
+                                    <ChevronRight className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => handlePageChange(totalPages)}
+                                    disabled={currentPage === totalPages}
+                                    className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                                    title="Last page"
+                                >
+                                    <ChevronsRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className="text-center py-24 bg-slate-900/40 rounded-3xl border border-slate-800/80 space-y-4">

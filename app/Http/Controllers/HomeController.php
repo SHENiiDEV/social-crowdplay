@@ -29,7 +29,7 @@ class HomeController extends Controller
 
         $games = $query->orderBy('sort_order', 'asc')->get();
 
-        $categories = ['All', 'Recommended', 'Baccarat', 'Roulette', 'Oracle', 'Blackjack', 'Slots'];
+        $categories = ['All', 'Recommended', 'Slots', 'Live Casino', 'Roulette', 'Blackjack', 'Baccarat', 'Mini Games'];
 
         return Inertia::render('Home', [
             'games' => $games,
