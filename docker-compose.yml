@@ -1,0 +1,80 @@
+name: social-casino
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: social-casino-app
+    container_name: social_casino_app
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+    networks:
+      - casino-net
+
+  web:
+    image: nginx:alpine
+    container_name: social_casino_web
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - casino-net
+
+  db:
+    image: mysql:8.0
+    container_name: social_casino_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: social_casino
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: casino
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - casino-net
+
+  redis:
+    image: redis:alpine
+    container_name: social_casino_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - casino-net
+
+  vite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: social_casino_vite
+    restart: unless-stopped
+    working_dir: /var/www
+    command: sh -c "rm -f public/hot && echo 'Vite production static mode active' && tail -f /dev/null"
+    ports:
+      - "5173:5173"
+
+    volumes:
+      - .:/var/www
+    networks:
+      - casino-net
+
+networks:
+  casino-net:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
