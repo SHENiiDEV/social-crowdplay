@@ -16,11 +16,11 @@ class GgrApiService
 
     public function __construct()
     {
-        $this->apiServer = rtrim(config('services.ggr.api_server', 'https://api.nexusggr.com'), '/');
-        $this->agentCode = config('services.ggr.agent_code', 'crowdplay');
-        $this->agentToken = config('services.ggr.agent_token', 'c9540f990614ec0e60efa22d4c5fe5fe');
-        $this->agentSecret = config('services.ggr.agent_secret', '7e49159d19c1db28e7f70966b1242606');
-        $this->mockMode = (bool) config('services.ggr.mock_mode', false);
+        $this->apiServer = rtrim(config('services.ggr.api_server') ?? env('GGR_API_SERVER') ?? env('GGR_API_URL') ?? 'https://api.nexusggr.eu', '/');
+        $this->agentCode = config('services.ggr.agent_code') ?? env('GGR_AGENT_CODE') ?? 'crowdplay';
+        $this->agentToken = config('services.ggr.agent_token') ?? env('GGR_AGENT_TOKEN') ?? 'c9540f990614ec0e60efa22d4c5fe5fe';
+        $this->agentSecret = config('services.ggr.agent_secret') ?? env('GGR_AGENT_SECRET') ?? '7e49159d19c1db28e7f70966b1242606';
+        $this->mockMode = (bool) (config('services.ggr.mock_mode') ?? env('GGR_MOCK_MODE', false));
     }
 
     /**
@@ -174,6 +174,15 @@ class GgrApiService
             ];
         }
 
+        // Live Casino providers (live dealer video tables) do not support RNG/RTP control
+        $liveProviders = ['PP_LIVE_PRO', 'EVOLUTION', 'EZUGI', 'PRAGMATICLIVE', 'VIVO', 'SA_GAMING', 'SPORTSBOOK'];
+        if (in_array(strtoupper($providerCode), $liveProviders, true)) {
+            return [
+                'status' => 0,
+                'msg' => 'RTP control is only supported for Slot games. Live casino tables use live dealer mechanics.',
+            ];
+        }
+
         return $this->sendRequest([
             'method' => 'control_rtp',
             'agent_code' => $this->agentCode,
@@ -185,66 +194,56 @@ class GgrApiService
     }
 
     /**
-     * Execute HTTP POST request to GGR API Server with multi-host fallback.
+     * Execute HTTP POST request directly to configured GGR API Server.
      */
     protected function sendRequest(array $payload): array
     {
-        $endpoints = array_unique([
-            $this->apiServer,
-            'https://api.nexusggr.com',
-            'https://api.nexusggr.dev',
-        ]);
+        $endpoint = $this->apiServer;
 
-        $lastError = null;
+        try {
+            $response = Http::timeout(15)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                    'Accept' => 'application/json',
+                ])
+                ->post($endpoint, $payload);
 
-        foreach ($endpoints as $endpoint) {
-            try {
-                $response = Http::timeout(12)
-                    ->withHeaders([
-                        'Content-Type' => 'application/json',
-                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-                        'Accept' => 'application/json',
-                    ])
-                    ->post($endpoint, $payload);
+            $json = $response->json();
 
-                $json = $response->json();
-
-                if (is_array($json)) {
-                    // Check if successful response or API error message
-                    if (($json['status'] ?? 0) == 1 || isset($json['providers']) || isset($json['games']) || isset($json['launch_url'])) {
-                        return $json;
-                    }
-
-                    $msg = $json['message'] ?? $json['msg'] ?? ($json['code'] ?? 'API_REQUEST_FAILED');
-                    $lastError = [
-                        'status' => 0,
-                        'code' => $json['code'] ?? null,
-                        'msg' => $msg,
-                        'endpoint' => $endpoint,
-                    ];
-                    continue;
-                }
-
-                if ($response->successful()) {
-                    return ['status' => 1, 'msg' => 'SUCCESS', 'data' => $response->body()];
-                }
-
-                $lastError = [
-                    'status' => 0,
-                    'msg' => "HTTP_{$response->status()}",
-                    'endpoint' => $endpoint,
-                ];
-            } catch (\Throwable $e) {
-                $lastError = [
-                    'status' => 0,
-                    'msg' => $e->getMessage(),
-                    'endpoint' => $endpoint,
-                ];
+            if (is_array($json)) {
+                return $json;
             }
-        }
 
-        Log::error('GGR API All Endpoints Failed', ['lastError' => $lastError, 'payload' => $payload]);
-        return $lastError ?: ['status' => 0, 'msg' => 'API_CONNECTION_FAILED'];
+            if ($response->successful()) {
+                return ['status' => 1, 'msg' => 'SUCCESS', 'data' => $response->body()];
+            }
+
+            Log::error("GGR API HTTP Error {$response->status()}", [
+                'endpoint' => $endpoint,
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'payload' => $payload,
+            ]);
+
+            return [
+                'status' => 0,
+                'msg' => "HTTP_{$response->status()}",
+                'endpoint' => $endpoint,
+            ];
+        } catch (\Throwable $e) {
+            Log::error('GGR API Connection Failed', [
+                'endpoint' => $endpoint,
+                'error' => $e->getMessage(),
+                'payload' => $payload,
+            ]);
+
+            return [
+                'status' => 0,
+                'msg' => $e->getMessage(),
+                'endpoint' => $endpoint,
+            ];
+        }
     }
 
     /**

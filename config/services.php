@@ -36,7 +36,7 @@ return [
     ],
 
     'ggr' => [
-        'api_server' => env('GGR_API_SERVER', env('GGR_API_URL', 'https://api.nexusggr.dev')),
+        'api_server' => env('GGR_API_SERVER', env('GGR_API_URL', 'https://api.nexusggr.eu')),
         'agent_code' => env('GGR_AGENT_CODE', 'crowdplay'),
         'agent_token' => env('GGR_AGENT_TOKEN', 'c9540f990614ec0e60efa22d4c5fe5fe'),
         'agent_secret' => env('GGR_AGENT_SECRET', '7e49159d19c1db28e7f70966b1242606'),
