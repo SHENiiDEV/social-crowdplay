@@ -92,8 +92,11 @@ Route::post('/api/jackpot/claim', function (\Illuminate\Http\Request $request) {
     return response()->json($result);
 });
 
-// Wheel of Fortune Endpoints
+// Daily Free 1 SC Bonus Endpoints (24h Cooldown)
+Route::get('/api/daily-bonus/status', [\App\Http\Controllers\DailyBonusController::class, 'status']);
+Route::post('/api/daily-bonus/claim', [\App\Http\Controllers\DailyBonusController::class, 'claim']);
 
+// Wheel of Fortune Endpoints
 Route::get('/api/wheel/status', [\App\Http\Controllers\WheelController::class, 'status']);
 Route::post('/api/wheel/spin', [\App\Http\Controllers\WheelController::class, 'spin']);
 

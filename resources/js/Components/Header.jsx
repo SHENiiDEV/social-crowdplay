@@ -139,6 +139,13 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
                                 <Link
                                     key={g.id}
                                     href={route('game.play', { slug: g.slug })}
+                                    onClick={(e) => {
+                                        if (!auth.user) {
+                                            e.preventDefault();
+                                            setShowSearchDropdown(false);
+                                            onOpenAuth('register');
+                                        }
+                                    }}
                                     className="flex items-center justify-between p-2 hover:bg-slate-800/80 rounded-xl transition-all group"
                                 >
                                     <div className="flex items-center gap-3 min-w-0">
@@ -316,6 +323,7 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
                 onClose={() => setIsStoreOpen(false)}
                 user={auth.user}
                 onBalanceUpdate={(newBal) => setLocalBalance(newBal)}
+                onOpenAuth={onOpenAuth}
             />
 
             {/* Referral Modal */}

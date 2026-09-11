@@ -31,6 +31,8 @@ class User extends Authenticatable
         'status',
         'is_blocked',
         'target_rtp',
+        'last_wheel_spin_at',
+        'last_daily_bonus_at',
     ];
 
     protected $hidden = [
@@ -49,6 +51,8 @@ class User extends Authenticatable
             'is_admin' => 'boolean',
             'is_blocked' => 'boolean',
             'target_rtp' => 'integer',
+            'last_wheel_spin_at' => 'datetime',
+            'last_daily_bonus_at' => 'datetime',
         ];
     }
 

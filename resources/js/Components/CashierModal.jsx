@@ -12,6 +12,7 @@ export default function CashierModal({ isOpen, onClose }) {
 
     const [selectedPackage, setSelectedPackage] = useState(10);
     const [customEur, setCustomEur] = useState('10');
+    const [customSc, setCustomSc] = useState((10 * effectiveRate).toString());
     const [paymentMethod, setPaymentMethod] = useState('visa_mastercard');
     const [loading, setLoading] = useState(false);
 
@@ -22,12 +23,25 @@ export default function CashierModal({ isOpen, onClose }) {
         { eur: 50, coins: 50 * effectiveRate, popular: false },
     ];
 
-    const currentEur = Number(customEur) || 0;
-    const calculatedCoins = currentEur * effectiveRate;
+    const handleEurChange = (val) => {
+        setCustomEur(val);
+        setSelectedPackage(null);
+        const eurNum = Number(val) || 0;
+        setCustomSc(Math.round(eurNum * effectiveRate).toString());
+    };
+
+    const handleScChange = (val) => {
+        setCustomSc(val);
+        setSelectedPackage(null);
+        const scNum = Number(val) || 0;
+        setCustomEur((scNum / effectiveRate).toFixed(2));
+    };
 
     const handleCheckout = async (e) => {
         e.preventDefault();
-        if (currentEur < 1) return alert('Minimum deposit is 1 EUR');
+        const currentEur = Number(customEur) || 0;
+        const currentSc = Number(customSc) || 0;
+        if (currentEur < 1 && currentSc < 1) return alert('Minimum deposit is $1.00 USD / 1 SC');
 
         setLoading(true);
         try {
@@ -40,6 +54,7 @@ export default function CashierModal({ isOpen, onClose }) {
                 },
                 body: JSON.stringify({
                     amount_eur: currentEur,
+                    amount_sc: currentSc,
                     payment_method: paymentMethod,
                 })
             });
@@ -114,34 +129,43 @@ export default function CashierModal({ isOpen, onClose }) {
                         </div>
                     </div>
 
-                    {/* Custom EUR Input Calculator */}
+                    {/* Custom EUR / SC Input Calculator */}
                     <div className="bg-slate-950/80 p-4 rounded-2xl border border-slate-800 space-y-3">
                         <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
-                            <span>Custom Deposit Calculator</span>
+                            <span>Custom SC Deposit Calculator</span>
                             <span className="text-amber-400 font-bold flex items-center gap-1">
                                 <Zap className="w-3.5 h-3.5" /> Instant Delivery
                             </span>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <div className="relative flex-1">
+                        <div className="flex flex-col sm:flex-row items-center gap-3">
+                            <div className="relative flex-1 w-full">
                                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</span>
                                 <input
                                     type="number"
                                     min="1"
-                                    max="5000"
+                                    max="50000"
                                     value={customEur}
-                                    onChange={(e) => {
-                                        setCustomEur(e.target.value);
-                                        setSelectedPackage(null);
-                                    }}
+                                    onChange={(e) => handleEurChange(e.target.value)}
                                     className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-8 pr-4 py-2.5 text-white font-bold focus:outline-none focus:border-amber-500"
-                                    placeholder="Enter USD amount"
+                                    placeholder="USD Amount"
                                 />
+                                <span className="text-[10px] text-slate-500 font-semibold absolute right-3 top-1/2 -translate-y-1/2">USD</span>
                             </div>
-                            <ArrowRight className="w-5 h-5 text-slate-600" />
-                            <div className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center justify-between">
-                                <span className="text-xs text-slate-400 font-semibold">You Get:</span>
-                                <span className="font-extrabold text-amber-400 text-base">{calculatedCoins} SC</span>
+
+                            <ArrowRight className="w-5 h-5 text-slate-600 hidden sm:block" />
+
+                            <div className="relative flex-1 w-full">
+                                <Coins className="w-4 h-4 text-amber-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="500000"
+                                    value={customSc}
+                                    onChange={(e) => handleScChange(e.target.value)}
+                                    className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-9 pr-10 py-2.5 text-amber-400 font-bold focus:outline-none focus:border-amber-500"
+                                    placeholder="SC Amount"
+                                />
+                                <span className="text-[10px] text-amber-400 font-black absolute right-3 top-1/2 -translate-y-1/2">SC</span>
                             </div>
                         </div>
                     </div>

@@ -351,6 +351,7 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                 isOpen={isStoreOpen}
                 onClose={() => setIsStoreOpen(false)}
                 user={auth.user}
+                onOpenAuth={(mode) => setAuthModal({ open: true, mode })}
             />
 
             {/* Jackpot Win Modal */}

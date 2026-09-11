@@ -27,6 +27,16 @@ export default function MainLayout({ children, currentCategory = 'All', searchQu
             });
             setIsBlockedAlertOpen(true);
         }
+
+        // Open Auth modal if redirected from game launch or URL param
+        if (!auth.user && typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const prompt = params.get('auth_prompt') || params.get('auth');
+            if (prompt === 'register' || prompt === 'login') {
+                setAuthMode(prompt);
+                setIsAuthOpen(true);
+            }
+        }
     }, [flash?.blocked_notice, auth?.user?.is_blocked, auth?.user?.status]);
 
     const handleOpenAuth = (mode = 'login') => {

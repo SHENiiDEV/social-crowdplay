@@ -19,7 +19,8 @@ class GameController extends Controller
 
         // 1. Require authentication to play games
         if (!$user) {
-            return redirect()->route('home')->with('error', 'Please log in or sign up an account to play casino games.');
+            return redirect()->route('home', ['auth_prompt' => 'register', 'game' => $slug])
+                ->with('error', 'Please log in or register an account to play casino games.');
         }
 
         // 2. Ensure user has a user_code identifier

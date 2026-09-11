@@ -18,7 +18,8 @@ class CashierController extends Controller
     public function checkout(Request $request)
     {
         $validated = $request->validate([
-            'amount_eur' => ['required', 'numeric', 'min:1', 'max:5000'],
+            'amount_eur' => ['nullable', 'numeric', 'min:1', 'max:50000'],
+            'amount_sc' => ['nullable', 'numeric', 'min:1', 'max:500000'],
             'payment_method' => ['required', 'string'],
         ]);
 
@@ -27,13 +28,21 @@ class CashierController extends Controller
         $promoMultiplier = (float) Setting::get('promo_multiplier', 1.0);
         $effectiveRate = $rate * $promoMultiplier;
 
-        $coinsToReceive = $validated['amount_eur'] * $effectiveRate;
+        if (!empty($validated['amount_sc'])) {
+            $coinsToReceive = (float) $validated['amount_sc'];
+            $amountEur = round($coinsToReceive / $effectiveRate, 2);
+            if ($amountEur < 1) $amountEur = 1.00;
+        } else {
+            $amountEur = (float) ($validated['amount_eur'] ?? 10);
+            $coinsToReceive = round($amountEur * $effectiveRate, 2);
+        }
+
         $orderId = 'ORD-' . strtoupper(Str::random(12));
 
         $deposit = DepositLog::create([
             'order_id' => $orderId,
             'user_id' => $user->id,
-            'amount_eur' => $validated['amount_eur'],
+            'amount_eur' => $amountEur,
             'coins_received' => $coinsToReceive,
             'rate_used' => $effectiveRate,
             'payment_method' => $validated['payment_method'],
@@ -43,7 +52,7 @@ class CashierController extends Controller
         return response()->json([
             'status' => 'success',
             'order_id' => $orderId,
-            'amount_eur' => $validated['amount_eur'],
+            'amount_eur' => $amountEur,
             'coins' => $coinsToReceive,
             'redirect_url' => route('simulator.payment', ['order_id' => $orderId]),
         ]);
