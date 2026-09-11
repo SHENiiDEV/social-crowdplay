@@ -46,15 +46,7 @@ class GgrSyncGames extends Command
         $totalSynced = 0;
         $categoryCounts = [];
 
-        $fallbackCovers = [
-            'Slots' => 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=60',
-            'Baccarat' => 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=800&auto=format&fit=crop&q=60',
-            'Roulette' => 'https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=800&auto=format&fit=crop&q=60',
-            'Blackjack' => 'https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=800&auto=format&fit=crop&q=60',
-            'Live Casino' => 'https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=800&auto=format&fit=crop&q=60',
-            'Mini Games' => 'https://images.unsplash.com/photo-1508873696983-2df515122519?w=800&auto=format&fit=crop&q=60',
-            'Sportsbook' => 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&auto=format&fit=crop&q=60',
-        ];
+        $apiServer = $ggrApi->getApiServer();
 
         foreach ($providers as $provider) {
             $providerCode = strtoupper($provider['code'] ?? 'PRAGMATIC');
@@ -66,7 +58,7 @@ class GgrSyncGames extends Command
 
             if (!$this->option('force-catalog')) {
                 // Rate limit spacing for API calls
-                usleep(600000);
+                usleep(500000);
                 $gamesRes = $ggrApi->getGames($providerCode);
 
                 if (($gamesRes['status'] ?? 0) === 1 && !empty($gamesRes['games'])) {
@@ -84,13 +76,36 @@ class GgrSyncGames extends Command
 
             foreach ($gamesList as $g) {
                 $gameCode = $g['game_code'] ?? ($g['code'] ?? null);
-                $gameName = $g['game_name'] ?? ($g['name'] ?? ($g['title'] ?? $gameCode));
-                $banner = $g['banner'] ?? ($g['image'] ?? ($g['cover_image'] ?? null));
-                $status = $g['status'] ?? 1;
-
                 if (!$gameCode) {
                     continue;
                 }
+
+                // Handle multi-language or string game names
+                $rawGameName = $g['game_name'] ?? ($g['name'] ?? ($g['title'] ?? $gameCode));
+                if (is_array($rawGameName)) {
+                    $gameName = $rawGameName['en'] ?? reset($rawGameName) ?: (string) $gameCode;
+                } else {
+                    $gameName = (string) ($rawGameName ?: $gameCode);
+                }
+
+                // Handle banner extraction across various GGR API schema versions
+                $rawBanner = $g['banner'] ?? ($g['image'] ?? ($g['cover_image'] ?? ($g['icon'] ?? ($g['thumbnail'] ?? ($g['img'] ?? ($g['img_url'] ?? null))))));
+                $banner = null;
+
+                if (!empty($rawBanner) && is_string($rawBanner)) {
+                    if (str_starts_with($rawBanner, 'http://') || str_starts_with($rawBanner, 'https://')) {
+                        $banner = $rawBanner;
+                    } elseif (str_starts_with($rawBanner, '/')) {
+                        $banner = "{$apiServer}{$rawBanner}";
+                    } else {
+                        $banner = "{$apiServer}/storage/games/" . strtolower($providerCode) . "/{$rawBanner}";
+                    }
+                } else {
+                    // Default standard Nexus CDN format
+                    $banner = "{$apiServer}/storage/games/" . strtolower($providerCode) . "/{$gameCode}.png";
+                }
+
+                $status = $g['status'] ?? 1;
 
                 // Determine Category & Game Type
                 $titleLower = strtolower($gameName);
@@ -126,8 +141,6 @@ class GgrSyncGames extends Command
                     'fortune-rabbit', '1067', '1309', 'minigame_aviator', 'nxpkul2hgclallno', 'crazytime00000001'
                 ]);
 
-                $cover = $banner ?: ($fallbackCovers[$category] ?? $fallbackCovers['Slots']);
-
                 Game::updateOrCreate(
                     ['provider_game_id' => $providerGameId],
                     [
@@ -137,7 +150,7 @@ class GgrSyncGames extends Command
                         'slug' => $slug,
                         'category' => $category,
                         'game_type' => $gameType,
-                        'cover_image' => $cover,
+                        'cover_image' => $banner,
                         'banner' => $banner,
                         'is_active' => $status == 1,
                         'is_recommended' => $isRecommended,

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { Play, Flame, Heart } from 'lucide-react';
+import { Play, Flame, Heart, Gamepad2 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 
 export function GameCard({ game, index = 0, onOpenAuth, isFavInitial = false, onFavToggle }) {
     const { auth } = usePage().props;
     const [isFav, setIsFav] = useState(isFavInitial);
+    const [imgError, setImgError] = useState(false);
     const isHot = game.is_recommended || index < 6;
     const providerName = game.provider_code || 'GGR API';
 
@@ -68,16 +69,27 @@ export function GameCard({ game, index = 0, onOpenAuth, isFavInitial = false, on
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none z-10" />
 
             {/* Thumbnail Image Container */}
-            <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-950">
-                <img
-                    src={game.cover_image}
-                    alt={game.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    loading="lazy"
-                    onError={(e) => {
-                        e.target.src = 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=60';
-                    }}
-                />
+            <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-950 flex items-center justify-center">
+                {(!game.cover_image || imgError) ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-amber-950/30 to-slate-950 border-b border-slate-800/60 text-center select-none relative">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(245,158,11,0.12),transparent_70%)]" />
+                        <Gamepad2 className="w-10 h-10 text-amber-400 mb-2 opacity-80 group-hover:scale-110 transition-transform" />
+                        <span className="text-xs font-black text-white line-clamp-2 px-2 z-10 leading-tight">
+                            {game.title}
+                        </span>
+                        <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mt-1 z-10">
+                            {providerName}
+                        </span>
+                    </div>
+                ) : (
+                    <img
+                        src={game.cover_image}
+                        alt={game.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                        onError={() => setImgError(true)}
+                    />
+                )}
 
                 {/* Ambient Dark Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />

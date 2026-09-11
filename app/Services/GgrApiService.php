@@ -23,6 +23,11 @@ class GgrApiService
         $this->mockMode = (bool) (config('services.ggr.mock_mode') ?? env('GGR_MOCK_MODE', false));
     }
 
+    public function getApiServer(): string
+    {
+        return $this->apiServer;
+    }
+
     /**
      * Retrieve list of game providers assigned to agent.
      */
