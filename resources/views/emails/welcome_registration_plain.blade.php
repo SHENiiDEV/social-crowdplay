@@ -20,5 +20,6 @@ WHAT TO EXPLORE:
 Start playing now: {{ config('app.url') }}
 
 ---
-CrowdPlay Casino • Social Gaming Entertainment
-If you did not register for this account, please contact support.
+{{ config('company.name') }} (Reg No: {{ config('company.number') }})
+{{ config('company.address') }}
+Support: {{ config('company.email') }}

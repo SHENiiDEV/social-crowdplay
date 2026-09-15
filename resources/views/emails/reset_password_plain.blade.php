@@ -13,5 +13,6 @@ This password reset link is valid for {{ $expiresInMinutes }} minutes.
 If you did not request a password reset, no further action is required and your account remains secure.
 
 ---
-CrowdPlay Casino • Social Gaming Entertainment
-For security reasons, never forward this email to anyone.
+{{ config('company.name') }} (Reg No: {{ config('company.number') }})
+{{ config('company.address') }}
+Support: {{ config('company.email') }}

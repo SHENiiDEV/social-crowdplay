@@ -49,7 +49,7 @@ export default function SweepsRules() {
                             </h2>
                             <div className="text-xs text-slate-300 leading-relaxed space-y-2">
                                 <p>
-                                    The sweepstakes promotions on this website are operated and sponsored by <strong>{company?.name}</strong>, Reg No: {company?.reg_number}, Address: {company?.address}.
+                                    The sweepstakes promotions on this website are operated and sponsored by <strong>{company?.name}</strong>, Reg No: {company?.number || company?.reg_number}, Address: {company?.address}.
                                 </p>
                                 <p className="text-slate-400">
                                     Promotions are open exclusively to legal residents where social sweepstakes gameplay is legally permitted, aged 18 years or older.

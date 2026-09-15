@@ -69,9 +69,12 @@
             <!-- Footer -->
             <tr>
                 <td class="footer">
-                    <p style="margin: 0 0 6px 0;">CrowdPlay Casino &bull; Social Gaming Entertainment</p>
+                    <p style="margin: 0 0 6px 0; font-weight: bold; color: #94a3b8;">{{ config('company.name') }} &bull; Social Gaming Entertainment</p>
+                    <p style="margin: 0 0 4px 0; font-size: 11px; color: #475569;">
+                        Reg No: {{ config('company.number') }} &bull; {{ config('company.address') }}
+                    </p>
                     <p style="margin: 0; font-size: 11px; color: #475569;">
-                        For security reasons, never forward this email to anyone.
+                        Support: <a href="mailto:{{ config('company.email') }}" style="color: #fbbf24; text-decoration: none;">{{ config('company.email') }}</a>
                     </p>
                 </td>
             </tr>

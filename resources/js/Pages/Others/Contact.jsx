@@ -67,8 +67,8 @@ export default function Contact() {
 
                         <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-[11px] text-slate-400 space-y-1">
                             <p><strong className="text-white">Company:</strong> {company?.name}</p>
-                            <p><strong className="text-white">Reg Number:</strong> {company?.reg_number}</p>
-                            <p><strong className="text-white">License:</strong> {company?.license}</p>
+                            <p><strong className="text-white">Reg Number:</strong> {company?.number || company?.reg_number}</p>
+                            {company?.license && <p><strong className="text-white">License:</strong> {company?.license}</p>}
                         </div>
                     </div>
 

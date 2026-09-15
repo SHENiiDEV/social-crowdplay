@@ -13,3 +13,8 @@ Please retain all correspondence and documents related to this matter. You may b
 Status: Blocked
 Case Number: {{ $caseNumber }}
 Name: {{ $user->name }}
+
+---
+{{ config('company.name') }} (Reg No: {{ config('company.number') }})
+{{ config('company.address') }}
+Compliance: {{ config('company.email') }}

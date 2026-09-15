@@ -131,8 +131,9 @@
         </div>
 
         <div class="footer">
-            Crowdplay Security & Risk Management &bull; Case ID: {{ $caseNumber }}<br>
-            Official notice dispatched to compliance: renat@crowdplay.io
+            {{ config('company.name') }} &bull; Security &amp; Risk Management &bull; Case ID: {{ $caseNumber }}<br>
+            Reg No: {{ config('company.number') }} &bull; {{ config('company.address') }}<br>
+            Compliance: <a href="mailto:{{ config('company.email') }}" style="color: #64748b;">{{ config('company.email') }}</a>
         </div>
     </div>
 </body>

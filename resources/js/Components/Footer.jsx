@@ -41,8 +41,8 @@ export default function Footer() {
                         </p>
 
                         <div className="text-xs text-slate-500 space-y-1 pt-1 font-mono">
-                            <p><strong className="text-slate-400 font-sans">Reg No:</strong> {company?.reg_number}</p>
-                            <p><strong className="text-slate-400 font-sans">License:</strong> {company?.license}</p>
+                            <p><strong className="text-slate-400 font-sans">Reg No:</strong> {company?.number || company?.reg_number}</p>
+                            {company?.license && <p><strong className="text-slate-400 font-sans">License:</strong> {company?.license}</p>}
                             <p className="flex items-start gap-1.5 pt-1 text-[11px] font-sans text-slate-400">
                                 <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
                                 <span>{company?.address}</span>

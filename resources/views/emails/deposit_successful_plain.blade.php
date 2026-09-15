@@ -17,5 +17,6 @@ RECEIPT DETAILS:
 Jump back into the games: {{ config('app.url') }}
 
 ---
-CrowdPlay Casino • Social Gaming Entertainment
-If you have any questions regarding this order, please contact support.
+{{ config('company.name') }} (Reg No: {{ config('company.number') }})
+{{ config('company.address') }}
+Billing & Support: {{ config('company.email') }}
