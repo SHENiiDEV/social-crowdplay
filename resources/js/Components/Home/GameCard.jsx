@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { motion } from 'framer-motion';
-import { Play, Flame, Heart, Gamepad2 } from 'lucide-react';
-import { Badge } from '../ui/badge';
+import { Play, Heart, Spade } from 'lucide-react';
 
 export function GameCard({ game, index = 0, onOpenAuth, isFavInitial = false, onFavToggle }) {
     const { auth } = usePage().props;
     const [isFav, setIsFav] = useState(isFavInitial);
     const [imgError, setImgError] = useState(false);
     const isHot = game.is_recommended || index < 6;
-    const providerName = game.provider_code || 'GGR API';
+    const providerName = game.provider_code || 'GGR';
 
     const handleFavoriteClick = async (e) => {
         e.preventDefault();
@@ -33,9 +32,7 @@ export function GameCard({ game, index = 0, onOpenAuth, isFavInitial = false, on
                 body: JSON.stringify({ game_id: game.id }),
             });
 
-            if (onFavToggle) {
-                onFavToggle(game.id, newFav);
-            }
+            if (onFavToggle) onFavToggle(game.id, newFav);
         } catch (err) {
             setIsFav(!newFav);
         }
@@ -44,44 +41,36 @@ export function GameCard({ game, index = 0, onOpenAuth, isFavInitial = false, on
     const handlePlayClick = (e) => {
         if (!auth.user) {
             e.preventDefault();
-            if (onOpenAuth) {
-                onOpenAuth('register');
-            } else {
-                window.location.href = route('home');
-            }
+            if (onOpenAuth) onOpenAuth('register');
+            else window.location.href = route('home');
         }
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
+        <motion.article
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-                type: 'spring',
-                stiffness: 120,
-                damping: 18,
-                delay: Math.min(index * 0.04, 0.4),
-            }}
-            whileHover={{ y: -6, scale: 1.02 }}
-            className="group relative bg-slate-900/90 border border-slate-800/80 rounded-3xl overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-500/50 hover:shadow-amber-500/10 hover:shadow-2xl flex flex-col justify-between"
+            transition={{ duration: 0.5, delay: Math.min(index * 0.03, 0.3), ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -4 }}
+            className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.06] bg-obsidian-900/70 transition-all duration-400 hover:border-gold-400/35 hover:shadow-[0_30px_60px_-32px_rgba(0,0,0,0.95)]"
         >
-            {/* Liquid Glass Edge Reflection */}
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none z-10" />
+            {/* Top hairline that lights up on hover */}
+            <span className="pointer-events-none absolute inset-x-6 top-0 z-20 h-px bg-gradient-to-r from-transparent via-gold-300/0 to-transparent transition-all duration-500 group-hover:via-gold-300/60" />
 
-            {/* Thumbnail Image Container */}
             <Link
                 href={route('game.play', { slug: game.slug })}
                 onClick={handlePlayClick}
-                className="relative aspect-[4/3] w-full overflow-hidden bg-slate-950 flex items-center justify-center block cursor-pointer"
+                className="relative block aspect-[4/3] w-full overflow-hidden bg-obsidian-950"
             >
                 {(!game.cover_image || imgError) ? (
-                    <div className="w-full h-full flex flex-col items-center justify-center p-3 sm:p-4 bg-gradient-to-br from-slate-900 via-amber-950/30 to-slate-950 border-b border-slate-800/60 text-center select-none relative">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(245,158,11,0.12),transparent_70%)]" />
-                        <Gamepad2 className="w-8 h-8 sm:w-10 sm:h-10 text-amber-400 mb-1.5 opacity-80 group-hover:scale-110 transition-transform" />
-                        <span className="text-[11px] sm:text-xs font-black text-white line-clamp-2 px-1 z-10 leading-tight">
+                    <div className="relative flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-obsidian-850 via-obsidian-900 to-obsidian-950 p-4 text-center">
+                        <div className="absolute inset-0"
+                             style={{ background: 'radial-gradient(70% 55% at 50% 38%, rgba(217,182,92,0.10), transparent 70%)' }} />
+                        <Spade className="relative mb-2 h-7 w-7 text-gold-400/70 transition-transform duration-500 group-hover:scale-110" />
+                        <span className="relative line-clamp-2 text-[11px] font-medium leading-tight text-slate-200">
                             {game.title}
                         </span>
-                        <span className="text-[9px] sm:text-[10px] text-amber-400 font-bold uppercase tracking-wider mt-1 z-10">
+                        <span className="relative mt-1.5 text-[8px] font-semibold uppercase tracking-[0.2em] text-gold-400/60">
                             {providerName}
                         </span>
                     </div>
@@ -89,77 +78,82 @@ export function GameCard({ game, index = 0, onOpenAuth, isFavInitial = false, on
                     <img
                         src={game.cover_image}
                         alt={game.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="h-full w-full object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.07]"
                         loading="lazy"
                         onError={() => setImgError(true)}
                     />
                 )}
 
-                {/* Ambient Dark Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                {/* Base vignette */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-obsidian-950 via-obsidian-950/10 to-transparent opacity-90" />
 
-                {/* Top Badges */}
-                <div className="absolute top-2 left-2 right-2 sm:top-3 sm:left-3 sm:right-3 flex items-center justify-between z-10 pointer-events-none">
-                    <Badge variant={isHot ? 'gold' : 'muted'} className="shadow-lg backdrop-blur-md text-[9px] sm:text-[10px] px-1.5 py-0.5 sm:px-2.5">
-                        {isHot && <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400 fill-amber-400" />}
-                        <span>{game.category || 'Slots'}</span>
-                    </Badge>
+                {/* Corner marks */}
+                <div className="pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between">
+                    {isHot ? (
+                        <span className="rounded-full border border-gold-400/30 bg-black/55 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.18em] text-gold-200 backdrop-blur-md">
+                            {game.category || 'Slots'}
+                        </span>
+                    ) : (
+                        <span className="rounded-full border border-white/10 bg-black/50 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.18em] text-slate-400 backdrop-blur-md">
+                            {game.category || 'Slots'}
+                        </span>
+                    )}
 
-                    <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-slate-300 bg-slate-950/85 backdrop-blur-md px-1.5 sm:px-2 py-0.5 rounded-full border border-slate-800">
+                    <span className="rounded-full border border-white/[0.08] bg-black/50 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.18em] text-slate-400 backdrop-blur-md">
                         {providerName}
                     </span>
                 </div>
 
-                {/* Play & Favorite Combined Hover Action Overlay (Desktop) */}
-                <div className="hidden sm:flex absolute inset-0 bg-slate-950/65 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300 items-center justify-center gap-2.5 p-4 z-20">
-                    <div className="px-5 py-3 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black rounded-2xl shadow-2xl shadow-amber-500/50 flex items-center gap-2 text-xs tracking-wide active:scale-95">
-                        <Play className="w-4 h-4 fill-slate-950" />
-                        <span>PLAY NOW</span>
-                    </div>
+                {/* Hover veil */}
+                <div className="absolute inset-0 hidden items-center justify-center gap-2.5 bg-obsidian-950/72 opacity-0 backdrop-blur-[3px] transition-opacity duration-400 group-hover:opacity-100 sm:flex">
+                    <span className="lux-btn-gold flex items-center gap-2 rounded-full px-6 py-3 text-[10px] font-bold uppercase tracking-[0.18em]">
+                        <Play className="relative z-10 h-3.5 w-3.5 fill-current" />
+                        <span className="relative z-10">Play</span>
+                    </span>
 
                     <button
                         type="button"
                         onClick={handleFavoriteClick}
-                        className={`p-3 rounded-2xl border backdrop-blur-md flex items-center justify-center shadow-xl active:scale-90 ${
+                        title={isFav ? 'Remove from favourites' : 'Add to favourites'}
+                        className={`flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur-md transition-all active:scale-90 ${
                             isFav
-                                ? 'bg-rose-500/20 border-rose-500/50 text-rose-400'
-                                : 'bg-slate-900/90 border-slate-700 text-slate-300 hover:text-rose-400 hover:border-rose-500/40'
+                                ? 'border-gold-400/45 bg-gold-400/12 text-gold-300'
+                                : 'border-white/12 bg-white/[0.06] text-slate-300 hover:border-gold-400/40 hover:text-gold-300'
                         }`}
-                        title={isFav ? 'Remove from Favorites' : 'Add to Favorites'}
                     >
-                        <Heart className={`w-4.5 h-4.5 transition-all ${isFav ? 'fill-rose-500 text-rose-500 scale-110' : ''}`} />
+                        <Heart className={`h-4 w-4 ${isFav ? 'fill-current' : ''}`} />
                     </button>
                 </div>
             </Link>
 
-            {/* Bottom Meta Bar */}
-            <div className="p-2.5 sm:p-4 flex items-center justify-between bg-slate-950/60 border-t border-slate-800/60">
+            {/* Meta */}
+            <div className="flex items-center justify-between gap-2 border-t border-white/[0.05] px-3.5 py-3">
                 <Link
                     href={route('game.play', { slug: game.slug })}
                     onClick={handlePlayClick}
-                    className="min-w-0 pr-2 flex-1 block"
+                    className="min-w-0 flex-1"
                 >
-                    <h4 className="text-xs sm:text-sm font-black text-white truncate group-hover:text-amber-400 transition-colors">
+                    <h4 className="truncate text-[13px] font-medium text-slate-100 transition-colors duration-300 group-hover:text-gold-200">
                         {game.title}
                     </h4>
-                    <p className="text-[10px] sm:text-[11px] font-medium text-slate-400 truncate">
-                        RTP ~96.5% • Verified
+                    <p className="mt-0.5 truncate text-[10px] font-light tracking-wide text-slate-600">
+                        RTP 96.5% · Verified
                     </p>
                 </Link>
 
                 <button
                     type="button"
                     onClick={handleFavoriteClick}
-                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl flex items-center justify-center transition-all shrink-0 border ${
+                    title={isFav ? 'Remove from favourites' : 'Add to favourites'}
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-all ${
                         isFav
-                            ? 'bg-rose-500/20 border-rose-500/50 text-rose-400'
-                            : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-rose-400'
+                            ? 'border-gold-400/40 bg-gold-400/10 text-gold-300'
+                            : 'border-white/[0.08] bg-white/[0.03] text-slate-500 hover:text-gold-300 hover:border-gold-400/30'
                     }`}
-                    title={isFav ? 'Remove from Favorites' : 'Add to Favorites'}
                 >
-                    <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isFav ? 'fill-rose-500 text-rose-500' : ''}`} />
+                    <Heart className={`h-3.5 w-3.5 ${isFav ? 'fill-current' : ''}`} />
                 </button>
             </div>
-        </motion.div>
+        </motion.article>
     );
 }

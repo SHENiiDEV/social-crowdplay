@@ -1,96 +1,263 @@
 @import "tailwindcss";
 
+/* ============================================================
+   CROWDPLAY — OBSIDIAN & GOLD DESIGN SYSTEM
+   Deep black surfaces, hairline gold, restrained motion.
+   ============================================================ */
+
 @theme {
     --font-sans: 'Outfit', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-    --color-crowdplay-dark: #0b1021;
-    --color-crowdplay-card: #131b35;
-    --color-crowdplay-card-hover: #1c284d;
-    --color-crowdplay-cyan: #00f2fe;
-    --color-crowdplay-purple: #a855f7;
-    --color-crowdplay-gold: #f59e0b;
+    --font-display: 'Cormorant Garamond', 'Outfit', ui-serif, Georgia, serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* Obsidian surface ramp */
+    --color-obsidian-950: #06070a;
+    --color-obsidian-900: #0a0b10;
+    --color-obsidian-850: #0e1017;
+    --color-obsidian-800: #13161f;
+    --color-obsidian-750: #191d28;
+    --color-obsidian-700: #232838;
+
+    /* Champagne gold ramp */
+    --color-gold-100: #fdf8e7;
+    --color-gold-200: #f6e9bd;
+    --color-gold-300: #ecd392;
+    --color-gold-400: #d9b65c;
+    --color-gold-500: #c39a3c;
+    --color-gold-600: #9a7828;
+    --color-gold-700: #6b521a;
+    --color-gold-900: #2a200a;
+
+    /* Supporting */
+    --color-jade-400: #6fd8a8;
+    --color-pearl-400: #c9cfdd;
+
+    --shadow-lux: 0 24px 60px -24px rgba(0, 0, 0, 0.9);
+    --shadow-lux-lg: 0 40px 100px -32px rgba(0, 0, 0, 0.95);
+}
+
+/* ---------- Base ---------- */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #06070a;
+    background-image:
+        radial-gradient(900px 500px at 78% -8%, rgba(217, 182, 92, 0.07), transparent 62%),
+        radial-gradient(700px 420px at 4% 6%, rgba(217, 182, 92, 0.035), transparent 60%),
+        linear-gradient(180deg, #08090d 0%, #06070a 55%, #05060a 100%);
+    background-attachment: fixed;
+    letter-spacing: -0.005em;
+}
+
+::selection {
+    background: rgba(217, 182, 92, 0.85);
+    color: #06070a;
 }
 
 @layer utilities {
-    .glass-panel {
-        background: rgba(19, 27, 53, 0.75);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+
+    /* ---------- Surfaces ---------- */
+
+    .lux-surface {
+        position: relative;
+        background:
+            linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0) 38%),
+            linear-gradient(165deg, #12141c 0%, #0b0d13 58%, #090a0f 100%);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
-    .glass-card {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+    .lux-surface-soft {
+        background: linear-gradient(165deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
     }
 
-    .crowdplay-gradient-text {
-        background: linear-gradient(135deg, #00f2fe 0%, #a855f7 50%, #f59e0b 100%);
+    .lux-gold-surface {
+        background:
+            linear-gradient(180deg, rgba(217, 182, 92, 0.09) 0%, rgba(217, 182, 92, 0.015) 40%),
+            linear-gradient(165deg, #14131a 0%, #0c0c11 100%);
+        border: 1px solid rgba(217, 182, 92, 0.24);
+        box-shadow: 0 30px 70px -34px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(236, 211, 146, 0.18);
+    }
+
+    /* Hairline light sweep along the top edge of a panel */
+    .lux-topline::before {
+        content: '';
+        position: absolute;
+        inset-inline: 12%;
+        top: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(236, 211, 146, 0.55), transparent);
+        pointer-events: none;
+    }
+
+    /* Fine film grain, keeps large dark areas from banding */
+    .lux-grain::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.35;
+        mix-blend-mode: overlay;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    }
+
+    /* ---------- Typography ---------- */
+
+    .text-gold {
+        background: linear-gradient(104deg, #f6e9bd 0%, #ecd392 28%, #d9b65c 52%, #f6e9bd 74%, #c39a3c 100%);
+        background-size: 220% 100%;
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
+        color: transparent;
     }
 
-    .cyan-gradient-text {
-        background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+    .text-gold-shimmer {
+        animation: lux-shimmer 7s ease-in-out infinite;
     }
 
-    .gold-gradient-text {
-        background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+    .eyebrow {
+        font-size: 0.625rem;
+        font-weight: 700;
+        letter-spacing: 0.34em;
+        text-transform: uppercase;
+        color: rgba(233, 236, 245, 0.42);
     }
 
-    .btn-crowdplay {
-        background: linear-gradient(135deg, #00f2fe 0%, #3b82f6 50%, #9333ea 100%);
-        box-shadow: 0 4px 20px -2px rgba(0, 242, 254, 0.35);
-        color: #ffffff;
-        font-weight: 800;
+    .num {
+        font-variant-numeric: tabular-nums;
+        font-feature-settings: 'tnum' 1;
     }
 
-    .btn-crowdplay:hover {
-        background: linear-gradient(135deg, #38ef7d 0%, #00f2fe 50%, #3b82f6 100%);
-        box-shadow: 0 6px 24px -2px rgba(0, 242, 254, 0.5);
+    /* ---------- Controls ---------- */
+
+    .lux-btn-gold {
+        position: relative;
+        background: linear-gradient(170deg, #f6e9bd 0%, #e2c273 26%, #c99f3f 62%, #a9812c 100%);
+        color: #100d05;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        border: 1px solid rgba(253, 248, 231, 0.55);
+        box-shadow: 0 14px 34px -14px rgba(201, 159, 63, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        overflow: hidden;
     }
 
-    .btn-gold {
-        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-        box-shadow: 0 4px 20px -2px rgba(245, 158, 11, 0.4);
-        color: #0b1021;
-        font-weight: 800;
-    }
-    
-    .btn-gold:hover {
-        background: linear-gradient(135deg, #fef08a 0%, #fbbf24 50%, #f59e0b 100%);
-        box-shadow: 0 6px 24px -2px rgba(245, 158, 11, 0.6);
+    .lux-btn-gold::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(100deg, transparent 32%, rgba(255, 255, 255, 0.55) 48%, transparent 64%);
+        transform: translateX(-120%);
+        transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .btn-purple {
-        background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #7e22ce 100%);
-        box-shadow: 0 4px 20px -2px rgba(168, 85, 247, 0.4);
-        color: #ffffff;
-        font-weight: 800;
+    .lux-btn-gold:hover::after {
+        transform: translateX(120%);
     }
 
-    .btn-purple:hover {
-        background: linear-gradient(135deg, #e879f9 0%, #c084fc 50%, #a855f7 100%);
-        box-shadow: 0 6px 24px -2px rgba(168, 85, 247, 0.6);
+    .lux-btn-gold:hover {
+        box-shadow: 0 18px 40px -14px rgba(201, 159, 63, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    }
+
+    .lux-btn-ghost {
+        background: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #e7eaf2;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        transition: border-color 0.25s ease, background 0.25s ease;
+    }
+
+    .lux-btn-ghost:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(236, 211, 146, 0.42);
+        color: #fdf8e7;
+    }
+
+    .lux-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1) 18%, rgba(255, 255, 255, 0.1) 82%, transparent);
+    }
+
+    .lux-ring-gold {
+        box-shadow: 0 0 0 1px rgba(217, 182, 92, 0.32), 0 26px 60px -30px rgba(0, 0, 0, 0.95);
+    }
+
+    /* ---------- Motion ---------- */
+
+    .lux-marquee {
+        animation: lux-marquee 48s linear infinite;
+    }
+
+    .lux-marquee:hover {
+        animation-play-state: paused;
+    }
+
+    .lux-fade-up {
+        animation: lux-fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 }
 
-/* Custom Scrollbars */
+@keyframes lux-shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes lux-marquee {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes lux-fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes lux-pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.82); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lux-marquee,
+    .text-gold-shimmer,
+    .lux-fade-up {
+        animation: none !important;
+    }
+}
+
+/* ---------- Scrollbars ---------- */
+
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
 }
+
 ::-webkit-scrollbar-track {
-    background: #0b1021;
+    background: #06070a;
 }
+
 ::-webkit-scrollbar-thumb {
-    background: #1e293b;
+    background: linear-gradient(180deg, #2a2f3f, #191d28);
     border-radius: 9999px;
+    border: 2px solid #06070a;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-    background: #334155;
+    background: linear-gradient(180deg, #6b521a, #3a2d10);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

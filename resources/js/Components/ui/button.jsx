@@ -3,22 +3,22 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
 const buttonVariants = cva(
-    'inline-flex items-center justify-center gap-2 rounded-xl text-sm font-extrabold tracking-wide transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400/50 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.97]',
+    'relative inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-wide transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian-950 disabled:opacity-40 disabled:pointer-events-none active:scale-[0.98] whitespace-nowrap',
     {
         variants: {
             variant: {
-                gold: 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 border border-amber-300/40',
-                cyan: 'bg-gradient-to-r from-cyan-500 via-cyan-600 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 border border-cyan-300/30',
-                glass: 'bg-slate-900/80 hover:bg-slate-800/90 text-slate-200 hover:text-white border border-slate-700/60 backdrop-blur-xl shadow-md hover:border-slate-600',
-                outline: 'border border-slate-700 bg-transparent hover:bg-slate-800/50 text-slate-300 hover:text-white',
-                ghost: 'bg-transparent hover:bg-slate-800/40 text-slate-300 hover:text-white',
-                danger: 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white shadow-lg shadow-rose-500/20',
+                gold: 'lux-btn-gold',
+                cyan: 'lux-btn-gold',
+                glass: 'lux-btn-ghost',
+                outline: 'border border-white/12 bg-transparent text-slate-300 hover:text-gold-100 hover:border-gold-400/40 hover:bg-white/[0.04]',
+                ghost: 'bg-transparent text-slate-400 hover:text-gold-200 hover:bg-white/[0.05]',
+                danger: 'bg-gradient-to-b from-rose-500/90 to-rose-700 text-white border border-rose-300/30 shadow-[0_14px_34px_-16px_rgba(244,63,94,0.7)]',
             },
             size: {
-                sm: 'h-9 px-3.5 text-xs rounded-lg',
-                md: 'h-11 px-5 text-sm rounded-xl',
-                lg: 'h-13 px-7 text-base rounded-2xl',
-                icon: 'h-10 w-10 p-0 rounded-xl',
+                sm: 'h-9 px-4 text-[11px] uppercase tracking-[0.12em]',
+                md: 'h-11 px-6 text-xs uppercase tracking-[0.12em]',
+                lg: 'h-14 px-8 text-[13px] uppercase tracking-[0.16em]',
+                icon: 'h-10 w-10 p-0',
             },
         },
         defaultVariants: {
@@ -30,11 +30,8 @@ const buttonVariants = cva(
 
 export function Button({ className, variant, size, children, ...props }) {
     return (
-        <button
-            className={cn(buttonVariants({ variant, size, className }))}
-            {...props}
-        >
-            {children}
+        <button className={cn(buttonVariants({ variant, size, className }))} {...props}>
+            <span className="relative z-10 inline-flex items-center gap-2">{children}</span>
         </button>
     );
 }

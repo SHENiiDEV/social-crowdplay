@@ -1,79 +1,53 @@
 import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { Home, Gamepad2, Trophy, Gift, User, LogIn, Coins } from 'lucide-react';
+import { Home, Gamepad2, Trophy, Gift, User, LogIn } from 'lucide-react';
+
+const item = (active) =>
+    `flex flex-1 flex-col items-center justify-center gap-1 py-1 transition-colors duration-300 ${
+        active ? 'text-gold-200' : 'text-slate-600 hover:text-slate-300'
+    }`;
+
+const label = 'text-[8px] font-semibold uppercase tracking-[0.16em]';
 
 export default function MobileBottomNav({ onOpenAuth, onOpenStore, onOpenWheel, onToggleSidebar, currentCategory }) {
     const { auth } = usePage().props;
 
     return (
-        <nav aria-label="Mobile Navigation" className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-slate-950/95 backdrop-blur-2xl border-t border-slate-800/80 z-30 px-2 flex items-center justify-around shadow-[0_-8px_24px_rgba(0,0,0,0.5)]">
-            {/* 1. Home / Lobby */}
-            <Link
-                href={route('home')}
-                className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
-                    currentCategory === 'All' ? 'text-amber-400' : 'text-slate-400 hover:text-slate-200'
-                }`}
-            >
-                <Home className="w-5 h-5 mb-0.5" />
-                <span className="text-[10px] font-black uppercase tracking-tight">Lobby</span>
+        <nav
+            aria-label="Mobile Navigation"
+            className="fixed bottom-0 left-0 right-0 z-30 flex h-[4.25rem] items-center justify-around border-t border-white/[0.06] bg-obsidian-950/92 px-2 backdrop-blur-2xl lg:hidden"
+        >
+            <Link href={route('home')} className={item(currentCategory === 'All')}>
+                <Home className="h-[18px] w-[18px]" />
+                <span className={label}>Lobby</span>
             </Link>
 
-            {/* 2. Categories Drawer */}
-            <button
-                type="button"
-                onClick={onToggleSidebar}
-                className="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-200 transition-colors"
-            >
-                <Gamepad2 className="w-5 h-5 mb-0.5" />
-                <span className="text-[10px] font-black uppercase tracking-tight">Catalog</span>
+            <button type="button" onClick={onToggleSidebar} className={item(false)}>
+                <Gamepad2 className="h-[18px] w-[18px]" />
+                <span className={label}>Catalogue</span>
             </button>
 
-            {/* 3. Daily Wheel (Centered Prominent Glow Button) */}
-            <button
-                type="button"
-                onClick={onOpenWheel}
-                className="flex flex-col items-center justify-center flex-1 py-1 -mt-4 group relative"
-            >
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-amber-400 to-yellow-300 p-0.5 shadow-lg shadow-amber-500/30 ring-2 ring-slate-950 flex items-center justify-center transition-transform active:scale-95">
-                    <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center text-amber-400">
-                        <Trophy className="w-5 h-5 animate-pulse" />
-                    </div>
-                </div>
-                <span className="text-[10px] font-black uppercase text-amber-400 mt-1 tracking-tight">Wheel</span>
+            <button type="button" onClick={onOpenWheel} className="relative -mt-6 flex flex-1 flex-col items-center justify-center gap-1.5">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-b from-gold-200 to-gold-500 ring-4 ring-[#06070a] transition-transform active:scale-95">
+                    <Trophy className="h-[18px] w-[18px] text-obsidian-950" />
+                </span>
+                <span className={`${label} text-gold-200`}>Wheel</span>
             </button>
 
-            {/* 4. Free 1 SC / Store */}
-            <button
-                type="button"
-                onClick={onOpenStore}
-                className="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-emerald-400 transition-colors relative"
-            >
-                <div className="relative">
-                    <Gift className="w-5 h-5 mb-0.5 text-emerald-400" />
-                    <span className="absolute -top-1.5 -right-2 bg-emerald-500 text-slate-950 text-[8px] font-black px-1 rounded-full leading-tight">
-                        1 SC
-                    </span>
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-tight text-emerald-400">Bonus</span>
+            <button type="button" onClick={onOpenStore} className={item(false)}>
+                <Gift className="h-[18px] w-[18px]" />
+                <span className={label}>Bonus</span>
             </button>
 
-            {/* 5. Profile or Auth */}
             {auth.user ? (
-                <Link
-                    href={route('profile')}
-                    className="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-cyan-400 transition-colors"
-                >
-                    <User className="w-5 h-5 mb-0.5" />
-                    <span className="text-[10px] font-black uppercase tracking-tight truncate max-w-[50px]">Profile</span>
+                <Link href={route('profile')} className={item(false)}>
+                    <User className="h-[18px] w-[18px]" />
+                    <span className={label}>Profile</span>
                 </Link>
             ) : (
-                <button
-                    type="button"
-                    onClick={() => onOpenAuth('register')}
-                    className="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-amber-400 transition-colors"
-                >
-                    <LogIn className="w-5 h-5 mb-0.5" />
-                    <span className="text-[10px] font-black uppercase tracking-tight">Sign Up</span>
+                <button type="button" onClick={() => onOpenAuth('register')} className={item(false)}>
+                    <LogIn className="h-[18px] w-[18px]" />
+                    <span className={label}>Sign Up</span>
                 </button>
             )}
         </nav>

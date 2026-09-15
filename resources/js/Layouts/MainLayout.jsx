@@ -51,7 +51,7 @@ export default function MainLayout({ children, currentCategory = 'All', searchQu
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-x-hidden">
+        <div className="min-h-screen bg-transparent text-slate-200 flex flex-col font-sans overflow-x-hidden">
             {/* Left Sidebar (Desktop Fixed + Mobile Offcanvas Drawer) */}
             <Sidebar
                 currentCategory={currentCategory}
@@ -70,7 +70,7 @@ export default function MainLayout({ children, currentCategory = 'All', searchQu
 
             {/* Main Content Area */}
             <main className="pl-0 lg:pl-64 pt-16 sm:pt-20 flex-1 flex flex-col min-h-screen pb-20 lg:pb-8 w-full max-w-full overflow-x-hidden">
-                <div className="flex-1 p-3.5 sm:p-6 lg:p-8 w-full max-w-7xl mx-auto">
+                <div className="flex-1 w-full max-w-[86rem] mx-auto px-4 sm:px-8 lg:px-12 pt-6 sm:pt-10 pb-16">
                     {children}
                 </div>
 

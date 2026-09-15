@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from '@inertiajs/react';
 import Logo from './Logo';
-import { Home, Star, ChevronDown, ChevronRight, Gift, Sparkles, Users, Dices, Gamepad2, Flame, Trophy, ShieldCheck, X } from 'lucide-react';
-import { Badge } from './ui/badge';
+import { Home, Star, ChevronDown, ChevronRight, Users, Dices, Gamepad2, Flame, Trophy, Sparkles, ShieldCheck, X } from 'lucide-react';
 
-export default function Sidebar({ currentCategory, categories = [], isOpen = false, onClose = () => {} }) {
+export default function Sidebar({ currentCategory, isOpen = false, onClose = () => {} }) {
     const [isCategoriesOpen, setIsCategoriesOpen] = useState(true);
 
     const categoriesList = [
@@ -15,87 +14,85 @@ export default function Sidebar({ currentCategory, categories = [], isOpen = fal
         { name: 'Sportsbook', icon: Flame },
     ];
 
-    const handleLinkClick = () => {
-        if (onClose) onClose();
-    };
+    const handleLinkClick = () => onClose && onClose();
+
+    const navItemClass = (active) =>
+        `group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13px] font-medium transition-all duration-300 ${
+            active
+                ? 'bg-white/[0.045] text-gold-200'
+                : 'text-slate-500 hover:bg-white/[0.025] hover:text-slate-200'
+        }`;
+
+    const ActiveMark = ({ active }) => (
+        <span
+            className={`absolute left-0 top-1/2 h-4 w-px -translate-y-1/2 rounded-full bg-gradient-to-b from-gold-200 to-gold-500 transition-opacity duration-300 ${
+                active ? 'opacity-100' : 'opacity-0'
+            }`}
+        />
+    );
 
     return (
         <>
-            {/* Mobile Backdrop Overlay */}
             {isOpen && (
-                <div
-                    onClick={onClose}
-                    className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
-                />
+                <div onClick={onClose} className="fixed inset-0 z-40 bg-obsidian-950/85 backdrop-blur-sm lg:hidden" />
             )}
 
-            {/* Sidebar Container */}
             <aside
-                className={`w-72 sm:w-64 bg-slate-950/95 backdrop-blur-2xl border-r border-slate-800/80 flex flex-col fixed top-0 bottom-0 left-0 z-50 select-none overflow-y-auto transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-                    isOpen ? 'translate-x-0 shadow-2xl shadow-amber-500/10' : '-translate-x-full'
+                className={`fixed bottom-0 left-0 top-0 z-50 flex w-72 select-none flex-col overflow-y-auto border-r border-white/[0.06] bg-obsidian-950/92 backdrop-blur-2xl transition-transform duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] sm:w-64 lg:translate-x-0 ${
+                    isOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
-                {/* CROWDPLAY Logo Header & Mobile Close Button */}
-                <div className="p-5 sm:p-6 border-b border-slate-800/80 flex items-center justify-between">
-                    <Link href={route('home')} onClick={handleLinkClick} className="block hover:opacity-90 transition-opacity">
+                {/* Brand */}
+                <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-6">
+                    <Link href={route('home')} onClick={handleLinkClick} className="block transition-opacity hover:opacity-80">
                         <Logo />
                     </Link>
                     <button
                         onClick={onClose}
-                        className="lg:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-colors"
-                        title="Close Menu"
+                        className="flex h-8 w-8 items-center justify-center rounded-full border border-white/[0.08] text-slate-500 transition-colors hover:text-white lg:hidden"
+                        title="Close"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="h-4 w-4" />
                     </button>
                 </div>
 
-                {/* Navigation Menu */}
-                <div className="p-4 space-y-6 flex-1">
+                <div className="flex-1 space-y-8 px-4 py-7">
                     <div>
-                        <p className="px-3 text-[10px] font-black uppercase text-slate-500 tracking-wider mb-2">Navigation</p>
-                        <nav className="space-y-1">
-                            <Link
-                                href={route('home')}
-                                onClick={handleLinkClick}
-                                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl font-extrabold text-sm transition-all duration-200 ${
-                                    currentCategory === 'All'
-                                        ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-inner'
-                                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-                                }`}
-                            >
-                                <Home className="w-4 h-4 text-amber-400" />
+                        <p className="px-3.5 pb-3 text-[9px] font-semibold uppercase tracking-[0.28em] text-slate-700">
+                            Navigation
+                        </p>
+                        <nav className="space-y-0.5">
+                            <Link href={route('home')} onClick={handleLinkClick} className={navItemClass(currentCategory === 'All')}>
+                                <ActiveMark active={currentCategory === 'All'} />
+                                <Home className="h-4 w-4 opacity-70" />
                                 <span>All Games</span>
                             </Link>
 
                             <Link
                                 href={route('home', { category: 'Recommended' })}
                                 onClick={handleLinkClick}
-                                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-2xl font-extrabold text-sm transition-all duration-200 ${
-                                    currentCategory === 'Recommended'
-                                        ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
-                                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-                                }`}
+                                className={navItemClass(currentCategory === 'Recommended')}
                             >
-                                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                                <ActiveMark active={currentCategory === 'Recommended'} />
+                                <Star className="h-4 w-4 opacity-70" />
                                 <span>Recommended</span>
                             </Link>
                         </nav>
                     </div>
 
-                    {/* Collapsible Categories */}
                     <div>
                         <button
                             onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
-                            className="w-full px-3 py-1 flex items-center justify-between text-[10px] font-black text-slate-500 uppercase tracking-wider hover:text-slate-300 transition-colors"
+                            className="flex w-full items-center justify-between px-3.5 pb-3 text-[9px] font-semibold uppercase tracking-[0.28em] text-slate-700 transition-colors hover:text-slate-500"
                         >
-                            <span>Game Categories</span>
-                            {isCategoriesOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                            <span>Categories</span>
+                            {isCategoriesOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                         </button>
 
                         {isCategoriesOpen && (
-                            <nav className="mt-2 space-y-1">
+                            <nav className="space-y-0.5">
                                 {categoriesList.map((cat) => {
-                                    const IconComponent = cat.icon;
+                                    const Icon = cat.icon;
                                     const isActive = currentCategory === cat.name;
 
                                     return (
@@ -103,17 +100,15 @@ export default function Sidebar({ currentCategory, categories = [], isOpen = fal
                                             key={cat.name}
                                             href={route('home', { category: cat.name })}
                                             onClick={handleLinkClick}
-                                            className={`flex items-center justify-between px-3.5 py-2 rounded-2xl text-xs font-extrabold transition-all ${
-                                                isActive
-                                                    ? 'bg-slate-900 text-amber-400 border border-amber-500/30 shadow-md'
-                                                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
-                                            }`}
+                                            className={navItemClass(isActive)}
                                         >
-                                            <div className="flex items-center gap-2.5">
-                                                <IconComponent className={`w-4 h-4 ${isActive ? 'text-amber-400' : 'text-slate-500'}`} />
-                                                <span>{cat.name}</span>
-                                            </div>
-                                            <Badge variant="muted" className="text-[9px] px-1.5 py-0">LIVE</Badge>
+                                            <ActiveMark active={isActive} />
+                                            <Icon className="h-4 w-4 opacity-70" />
+                                            <span className="flex-1">{cat.name}</span>
+                                            <span className="flex items-center gap-1 text-[8px] font-semibold uppercase tracking-[0.18em] text-slate-700">
+                                                <span className="h-1 w-1 rounded-full bg-jade-400/70" />
+                                                Live
+                                            </span>
                                         </Link>
                                     );
                                 })}
@@ -121,29 +116,34 @@ export default function Sidebar({ currentCategory, categories = [], isOpen = fal
                         )}
                     </div>
 
-                    {/* Crowdplay Community & Referral Box */}
-                    <div className="relative bg-slate-900/80 p-4 rounded-2xl border border-slate-800 space-y-2 overflow-hidden">
-                        <div className="flex items-center gap-2 text-cyan-400 font-black text-xs">
-                            <Users className="w-4 h-4 text-cyan-400" />
-                            <span>Refer & Earn</span>
+                    {/* Referral card */}
+                    <div className="relative overflow-hidden rounded-2xl border border-gold-400/18 p-5"
+                         style={{ background: 'linear-gradient(165deg, rgba(217,182,92,0.07), rgba(255,255,255,0.012))' }}>
+                        <div className="flex items-center gap-2 text-gold-300">
+                            <Users className="h-3.5 w-3.5" />
+                            <span className="text-[10px] font-semibold uppercase tracking-[0.2em]">Refer & Earn</span>
                         </div>
-                        <p className="text-[11px] text-slate-400 font-medium leading-relaxed">Invite your friends to earn +50 free Social Coins!</p>
+                        <p className="mt-3 text-[11px] font-light leading-relaxed text-slate-500">
+                            Invite a friend and receive 50 Social Coins on their first spin.
+                        </p>
                         <button
-                            onClick={() => alert('Referral link copied to clipboard!')}
-                            className="w-full py-2 px-3 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 text-xs font-extrabold border border-cyan-500/30 transition-all text-center"
+                            onClick={() => navigator.clipboard && navigator.clipboard.writeText(window.location.origin)}
+                            className="mt-4 w-full rounded-full border border-gold-400/28 bg-gold-400/[0.06] py-2.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-gold-200 transition-all hover:bg-gold-400/12"
                         >
-                            Copy Invite Link
+                            Copy invite link
                         </button>
                     </div>
                 </div>
 
-                {/* Provider Badge Footer */}
-                <div className="p-4 border-t border-slate-800/80 bg-slate-950/80 text-center space-y-1">
-                    <div className="flex items-center justify-center gap-1.5 text-emerald-400 text-[10px] font-bold">
-                        <ShieldCheck className="w-3.5 h-3.5" />
+                {/* Footer seal */}
+                <div className="border-t border-white/[0.06] px-5 py-5 text-center">
+                    <div className="flex items-center justify-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-600">
+                        <ShieldCheck className="h-3 w-3 text-gold-400/60" />
                         <span>GGR Seamless Protected</span>
                     </div>
-                    <p className="text-[10px] text-slate-500 font-medium">CROWDPLAY Social Casino Engine</p>
+                    <p className="mt-1.5 text-[9px] font-light tracking-[0.1em] text-slate-700">
+                        Crowdplay Casino Engine
+                    </p>
                 </div>
             </aside>
         </>

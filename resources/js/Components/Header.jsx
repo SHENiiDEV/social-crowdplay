@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Coins, PlusCircle, LogOut, Shield, Gift, Sparkles, User as UserIcon, Volume2, VolumeX, Trophy, Menu, X, ArrowRight } from 'lucide-react';
+import { Search, Plus, LogOut, Shield, Gift, User as UserIcon, Volume2, VolumeX, Trophy, Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
-import { Badge } from './ui/badge';
 import Logo from './Logo';
 import StoreModal from './Modals/StoreModal';
 import { ReferralModal } from './Modals/ReferralModal';
 import { DailyWheelModal } from './Modals/DailyWheelModal';
 import { soundFx } from '../utils/soundFx';
+
+const iconButton =
+    'flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/[0.07] text-slate-500 transition-all duration-300 hover:border-gold-400/30 hover:text-gold-200';
 
 export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSearchQuery }) {
     const { auth, games = [] } = usePage().props;
@@ -24,7 +26,6 @@ export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSe
     const [showSearchDropdown, setShowSearchDropdown] = useState(false);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
-    // Track balance differences to trigger floating animated badges & audio FX
     useEffect(() => {
         const activeBal = localBalance !== null ? localBalance : (auth.user ? Number(auth.user.game_balance) : null);
         if (activeBal === null) return;
@@ -33,20 +34,13 @@ export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSe
             const diff = activeBal - prevBalance;
             if (Math.abs(diff) >= 0.01) {
                 setBalanceDiff({ amount: diff, id: Date.now() });
-
-                if (diff > 0) {
-                    soundFx.playCoinSound();
-                }
-
-                setTimeout(() => {
-                    setBalanceDiff(null);
-                }, 2200);
+                if (diff > 0) soundFx.playCoinSound();
+                setTimeout(() => setBalanceDiff(null), 2200);
             }
         }
         setPrevBalance(activeBal);
     }, [localBalance, auth.user]);
 
-    // Live Balance Polling (every 2.5s) to reflect real-time GGR spin debits/wins in top nav
     useEffect(() => {
         if (!auth.user) return;
 
@@ -55,26 +49,19 @@ export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSe
                 const res = await fetch('/user/balance');
                 if (res.ok) {
                     const data = await res.json();
-                    if (typeof data.balance === 'number') {
-                        setLocalBalance(data.balance);
-                    }
+                    if (typeof data.balance === 'number') setLocalBalance(data.balance);
                 }
-            } catch (e) {
-                // Ignore transient network errors
-            }
+            } catch (e) { /* transient */ }
         };
 
         fetchBalance();
         const interval = setInterval(fetchBalance, 2500);
 
         const handleCustomBalanceUpdate = (e) => {
-            if (e.detail?.balance !== undefined) {
-                setLocalBalance(e.detail.balance);
-            }
+            if (e.detail?.balance !== undefined) setLocalBalance(e.detail.balance);
         };
 
         window.addEventListener('balanceUpdated', handleCustomBalanceUpdate);
-
         return () => {
             clearInterval(interval);
             window.removeEventListener('balanceUpdated', handleCustomBalanceUpdate);
@@ -97,10 +84,7 @@ export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSe
         }
     };
 
-    const handleToggleMute = () => {
-        const muted = soundFx.toggleMute();
-        setIsMuted(muted);
-    };
+    const handleToggleMute = () => setIsMuted(soundFx.toggleMute());
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
@@ -113,202 +97,187 @@ export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSe
         ? localBalance
         : (auth.user ? Number(auth.user.game_balance) : 0);
 
+    const balanceTone = balanceDiff?.amount > 0
+        ? 'text-jade-400'
+        : (balanceDiff?.amount < 0 ? 'text-rose-300' : 'text-gold-200');
+
+    const renderResult = (g, onNavigate) => (
+        <Link
+            key={g.id}
+            href={route('game.play', { slug: g.slug })}
+            onClick={(e) => {
+                onNavigate && onNavigate();
+                if (!auth.user) {
+                    e.preventDefault();
+                    setShowSearchDropdown(false);
+                    onOpenAuth('register');
+                }
+            }}
+            className="group flex items-center justify-between gap-3 rounded-xl px-2.5 py-2 transition-colors hover:bg-white/[0.04]"
+        >
+            <div className="flex min-w-0 items-center gap-3">
+                <img src={g.cover_image} alt={g.title} className="h-9 w-9 rounded-lg border border-white/[0.06] object-cover" />
+                <div className="min-w-0">
+                    <p className="truncate text-[12px] font-medium text-slate-200 group-hover:text-gold-200">{g.title}</p>
+                    <p className="text-[9px] uppercase tracking-[0.16em] text-slate-600">{g.provider_code || 'GGR'}</p>
+                </div>
+            </div>
+            <span className="shrink-0 text-[9px] font-semibold uppercase tracking-[0.18em] text-gold-400/70">Play</span>
+        </Link>
+    );
+
     return (
         <>
-            <header className="h-16 sm:h-20 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/80 fixed top-0 left-0 lg:left-64 right-0 z-30 px-3 sm:px-6 lg:px-8 flex items-center justify-between shadow-2xl transition-all duration-300">
-                {/* Left Section: Mobile Hamburger Toggle + Logo (on mobile) + Search on desktop */}
-                <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
-                    {/* Mobile Hamburger Menu Button */}
+            <header className="fixed left-0 right-0 top-0 z-30 flex h-16 items-center justify-between border-b border-white/[0.06] bg-obsidian-950/80 px-4 backdrop-blur-2xl sm:h-20 sm:px-6 lg:left-64 lg:px-10">
+                {/* Left */}
+                <div className="flex min-w-0 items-center gap-3 sm:gap-5">
                     <button
                         type="button"
                         onClick={onToggleSidebar}
-                        className="lg:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-400 hover:border-slate-700 transition-colors shrink-0"
-                        title="Open Menu"
+                        className={`${iconButton} lg:hidden`}
+                        title="Menu"
                     >
-                        <Menu className="w-5 h-5" />
+                        <Menu className="h-4 w-4" />
                     </button>
 
-                    {/* Mobile Brand Logo */}
-                    <div className="lg:hidden shrink-0">
-                        <Link href={route('home')} className="block scale-90 sm:scale-100 origin-left">
-                            <Logo />
+                    <div className="shrink-0 lg:hidden">
+                        <Link href={route('home')} className="block origin-left scale-90">
+                            <Logo showText={false} className="h-9" />
                         </Link>
                     </div>
 
-                    {/* Desktop Search Input & Instant Autocomplete Dropdown */}
-                    <div className="relative hidden md:block w-64 lg:w-80 xl:w-96">
+                    <div className="relative hidden md:block w-64 lg:w-80">
                         <form onSubmit={handleSearchSubmit} className="relative w-full">
-                            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                            <Search className="pointer-events-none absolute left-4 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-600" />
                             <input
                                 type="text"
                                 value={searchQuery || ''}
                                 onChange={handleSearchChange}
                                 onFocus={() => searchQuery && searchQuery.trim().length >= 2 && setShowSearchDropdown(true)}
                                 onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
-                                placeholder="Search 3,200+ games..."
-                                className="w-full bg-slate-900/90 border border-slate-800/80 rounded-2xl pl-10 pr-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/30 transition-all"
+                                placeholder="Search the collection"
+                                className="w-full rounded-full border border-white/[0.07] bg-white/[0.025] py-2.5 pl-10 pr-4 text-[13px] font-light text-white placeholder-slate-600 transition-all duration-300 focus:border-gold-400/35 focus:bg-white/[0.04] focus:outline-none"
                             />
                         </form>
 
-                        {/* Instant Search Autocomplete Dropdown */}
                         {showSearchDropdown && searchResults.length > 0 && (
-                            <div className="absolute top-12 left-0 right-0 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 space-y-1">
-                                <p className="px-3 py-1 text-[10px] font-black uppercase text-slate-500">Matching Games</p>
-                                {searchResults.map(g => (
-                                    <Link
-                                        key={g.id}
-                                        href={route('game.play', { slug: g.slug })}
-                                        onClick={(e) => {
-                                            if (!auth.user) {
-                                                e.preventDefault();
-                                                setShowSearchDropdown(false);
-                                                onOpenAuth('register');
-                                            }
-                                        }}
-                                        className="flex items-center justify-between p-2 hover:bg-slate-800/80 rounded-xl transition-all group"
-                                    >
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <img src={g.cover_image} alt={g.title} className="w-8 h-8 rounded-lg object-cover" />
-                                            <div className="min-w-0">
-                                                <p className="text-xs font-black text-white truncate group-hover:text-amber-400">{g.title}</p>
-                                                <p className="text-[10px] text-slate-400">{g.provider_code || 'GGR API'}</p>
-                                            </div>
-                                        </div>
-                                        <Badge variant="gold" className="text-[9px] px-2 py-0.5">PLAY</Badge>
-                                    </Link>
-                                ))}
+                            <div className="lux-surface absolute left-0 right-0 top-14 z-50 space-y-0.5 rounded-2xl p-2">
+                                <p className="px-2.5 py-1.5 text-[8px] font-semibold uppercase tracking-[0.24em] text-slate-700">
+                                    Matching titles
+                                </p>
+                                {searchResults.map(g => renderResult(g))}
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Right Side Navigation & User Actions */}
-                <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-                    {/* Mobile Search Toggle Button */}
-                    <button
-                        onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                        className="md:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-400 flex items-center justify-center transition-all"
-                        title="Search Games"
-                    >
-                        <Search className="w-4 h-4" />
+                {/* Right */}
+                <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+                    <button onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)} className={`${iconButton} md:hidden`} title="Search">
+                        <Search className="h-4 w-4" />
                     </button>
 
-                    {/* Audio Mute Toggle Button */}
-                    <button
-                        onClick={handleToggleMute}
-                        title={isMuted ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
-                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-400 flex items-center justify-center transition-all shadow-md shrink-0"
-                    >
-                        {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
+                    <button onClick={handleToggleMute} className={iconButton} title={isMuted ? 'Unmute' : 'Mute'}>
+                        {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                     </button>
 
-                    {/* Daily Wheel Bonus Button */}
                     <button
                         onClick={() => setIsWheelOpen(true)}
-                        className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-black transition-all shadow-sm shrink-0"
-                        title="Spin Daily Wheel"
+                        className="flex shrink-0 items-center gap-2 rounded-full border border-gold-400/25 bg-gold-400/[0.06] px-3 py-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-gold-200 transition-all duration-300 hover:bg-gold-400/12 sm:px-4"
+                        title="Daily Wheel"
                     >
-                        <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+                        <Trophy className="h-3.5 w-3.5" />
                         <span className="hidden md:inline">Daily Wheel</span>
                     </button>
 
-                    {/* Desktop Nav Links */}
-                    <nav className="hidden xl:flex items-center gap-4 text-sm font-extrabold text-slate-300">
-                        <Link href={route('home')} className="hover:text-amber-400 transition-colors">Home</Link>
+                    <nav className="hidden items-center gap-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 xl:flex">
+                        <Link href={route('home')} className="transition-colors hover:text-gold-200">Home</Link>
                         <button
-                            onClick={() => {
-                                if (!auth.user) onOpenAuth('register');
-                                else setIsReferralOpen(true);
-                            }}
-                            className="flex items-center gap-1.5 text-slate-300 hover:text-amber-400 transition-colors"
+                            onClick={() => (!auth.user ? onOpenAuth('register') : setIsReferralOpen(true))}
+                            className="flex items-center gap-1.5 transition-colors hover:text-gold-200"
                         >
-                            <Gift className="w-4 h-4 text-amber-400" />
+                            <Gift className="h-3.5 w-3.5" />
                             <span>Referral</span>
                         </button>
                         {auth.user?.is_admin && (
-                            <Link href={route('admin.dashboard')} className="flex items-center gap-1.5 text-amber-400 font-black bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/30 hover:bg-amber-500/20 transition-all">
-                                <Shield className="w-4 h-4" />
+                            <Link
+                                href={route('admin.dashboard')}
+                                className="flex items-center gap-1.5 rounded-full border border-gold-400/25 px-3 py-1.5 text-gold-200 transition-all hover:bg-gold-400/10"
+                            >
+                                <Shield className="h-3.5 w-3.5" />
                                 <span>Admin</span>
                             </Link>
                         )}
                     </nav>
 
-                    {/* Authenticated User Actions vs Guest Buttons */}
                     {auth.user ? (
                         <div className="flex items-center gap-2 sm:gap-3">
-                            {/* Balance Pill & Buy Coins Button */}
-                            <div className="relative flex items-center bg-slate-900/90 rounded-xl sm:rounded-2xl p-1 sm:p-1.5 pl-2.5 sm:pl-3.5 border border-amber-500/30 shadow-lg">
-                                {/* Floating Coin Change Badge Animation */}
+                            {/* Balance */}
+                            <div className="relative flex items-center gap-3 rounded-full border border-gold-400/22 bg-white/[0.025] py-1 pl-4 pr-1">
                                 <AnimatePresence>
                                     {balanceDiff && (
                                         <motion.div
                                             key={balanceDiff.id}
-                                            initial={{ opacity: 0, y: balanceDiff.amount > 0 ? 10 : -10, scale: 0.8 }}
-                                            animate={{ opacity: 1, y: balanceDiff.amount > 0 ? -28 : 28, scale: 1.1 }}
-                                            exit={{ opacity: 0, scale: 0.5 }}
-                                            transition={{ duration: 0.4, type: 'spring', stiffness: 300 }}
-                                            className={`absolute left-2 sm:left-3 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-black font-mono shadow-2xl z-50 flex items-center gap-1 border pointer-events-none ${
+                                            initial={{ opacity: 0, y: balanceDiff.amount > 0 ? 8 : -8 }}
+                                            animate={{ opacity: 1, y: balanceDiff.amount > 0 ? -26 : 26 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                                            className={`pointer-events-none absolute left-4 z-50 rounded-full border px-2.5 py-0.5 font-mono num text-[10px] font-semibold ${
                                                 balanceDiff.amount > 0
-                                                    ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white border-emerald-300 shadow-emerald-500/50'
-                                                    : 'bg-gradient-to-r from-rose-600 to-rose-500 text-white border-rose-300 shadow-rose-500/50'
+                                                    ? 'border-jade-400/40 bg-jade-400/12 text-jade-400'
+                                                    : 'border-rose-400/40 bg-rose-500/12 text-rose-300'
                                             }`}
                                         >
-                                            {balanceDiff.amount > 0 ? `+${balanceDiff.amount.toFixed(2)} SC` : `${balanceDiff.amount.toFixed(2)} SC`}
+                                            {balanceDiff.amount > 0 ? '+' : ''}{balanceDiff.amount.toFixed(2)}
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
 
-                                <div className="flex items-center gap-1.5 sm:gap-2 mr-2 sm:mr-3">
-                                    <Coins className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 shrink-0 ${balanceDiff ? 'scale-125' : 'animate-pulse'} ${balanceDiff?.amount > 0 ? 'text-emerald-400' : (balanceDiff?.amount < 0 ? 'text-rose-400' : 'text-amber-400')}`} />
-                                    <div>
-                                        <span className="text-[8px] sm:text-[9px] uppercase font-black tracking-wider text-slate-400 block leading-none hidden sm:block">Balance</span>
-                                        <span className={`font-black text-xs sm:text-sm md:text-base leading-none font-mono transition-colors duration-300 ${
-                                            balanceDiff?.amount > 0
-                                                ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]'
-                                                : (balanceDiff?.amount < 0
-                                                    ? 'text-rose-400 drop-shadow-[0_0_8px_rgba(251,113,133,0.8)]'
-                                                    : 'text-amber-400')
-                                        }`}>
-                                            {currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] sm:text-xs font-sans text-amber-300">SC</span>
-                                        </span>
-                                    </div>
+                                <div className="leading-none">
+                                    <span className="hidden text-[7px] font-semibold uppercase tracking-[0.24em] text-slate-600 sm:block">
+                                        Balance
+                                    </span>
+                                    <span className={`mt-0.5 block font-mono num text-[13px] font-semibold transition-colors duration-300 sm:text-sm ${balanceTone}`}>
+                                        {currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        <span className="ml-1 font-sans text-[9px] text-slate-600">SC</span>
+                                    </span>
                                 </div>
 
-                                <Button
-                                    variant="gold"
-                                    size="sm"
+                                <button
                                     onClick={() => setIsStoreOpen(true)}
-                                    className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-black shadow-md shrink-0"
+                                    className="lux-btn-gold flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-[9px] font-bold uppercase tracking-[0.14em]"
                                 >
-                                    <PlusCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                    <span className="hidden sm:inline">BUY COINS</span>
-                                </Button>
+                                    <Plus className="relative z-10 h-3.5 w-3.5" />
+                                    <span className="relative z-10 hidden sm:inline">Buy</span>
+                                </button>
                             </div>
 
-                            {/* User Profile Dropdown */}
+                            {/* Account */}
                             <div className="relative">
                                 <button
                                     onClick={() => setUserDropdown(!userDropdown)}
-                                    className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-all"
+                                    className="flex items-center gap-2 rounded-full border border-white/[0.07] py-1 pl-1 pr-1 transition-colors hover:border-white/15 md:pr-3.5"
                                 >
-                                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center font-black text-white text-xs shadow-md">
+                                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-gold-200 to-gold-600 text-[11px] font-semibold text-obsidian-950">
                                         {auth.user.name.charAt(0).toUpperCase()}
-                                    </div>
-                                    <span className="text-xs font-extrabold text-white max-w-[80px] truncate hidden md:inline">{auth.user.name}</span>
+                                    </span>
+                                    <span className="hidden max-w-[84px] truncate text-[12px] font-medium text-slate-300 md:inline">
+                                        {auth.user.name}
+                                    </span>
                                 </button>
 
                                 {userDropdown && (
-                                    <div className="absolute right-0 mt-2 w-52 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50">
-                                        <div className="p-3 border-b border-slate-800 mb-1 space-y-0.5">
-                                            <p className="text-xs font-black text-white truncate">{auth.user.name}</p>
-                                            <p className="text-[11px] font-medium text-slate-400 truncate">{auth.user.email}</p>
+                                    <div className="lux-surface absolute right-0 mt-3 w-56 rounded-2xl p-2">
+                                        <div className="border-b border-white/[0.06] px-3 pb-3 pt-2">
+                                            <p className="truncate text-[13px] font-medium text-white">{auth.user.name}</p>
+                                            <p className="mt-0.5 truncate text-[10px] font-light text-slate-600">{auth.user.email}</p>
                                         </div>
 
                                         <Link
                                             href={route('profile')}
-                                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-extrabold text-slate-200 hover:text-amber-400 hover:bg-slate-800/60 rounded-xl transition-all mb-1"
+                                            className="mt-1.5 flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-[12px] font-medium text-slate-300 transition-colors hover:bg-white/[0.04] hover:text-gold-200"
                                         >
-                                            <UserIcon className="w-4 h-4 text-amber-400" />
+                                            <UserIcon className="h-3.5 w-3.5 opacity-70" />
                                             <span>My Profile</span>
                                         </Link>
 
@@ -316,9 +285,9 @@ export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSe
                                             href={route('logout')}
                                             method="post"
                                             as="button"
-                                            className="w-full flex items-center gap-2 px-3 py-2 text-xs font-extrabold text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"
+                                            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-[12px] font-medium text-slate-500 transition-colors hover:bg-rose-500/[0.07] hover:text-rose-300"
                                         >
-                                            <LogOut className="w-4 h-4" />
+                                            <LogOut className="h-3.5 w-3.5 opacity-70" />
                                             <span>Log Out</span>
                                         </Link>
                                     </div>
@@ -326,21 +295,11 @@ export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSe
                             </div>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-1.5 sm:gap-2.5">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onOpenAuth('login')}
-                                className="px-2.5 sm:px-4 py-1 sm:py-1.5 text-xs font-extrabold"
-                            >
+                        <div className="flex items-center gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => onOpenAuth('login')}>
                                 Login
                             </Button>
-                            <Button
-                                variant="gold"
-                                size="sm"
-                                onClick={() => onOpenAuth('register')}
-                                className="px-3 sm:px-4 py-1 sm:py-1.5 text-xs font-black shadow-md shadow-amber-500/20"
-                            >
+                            <Button variant="gold" size="sm" onClick={() => onOpenAuth('register')}>
                                 Sign Up
                             </Button>
                         </div>
@@ -348,62 +307,34 @@ export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSe
                 </div>
             </header>
 
-            {/* Expandable Mobile Search Bar Overlay */}
+            {/* Mobile search */}
             {isMobileSearchOpen && (
-                <div className="md:hidden fixed top-16 left-0 right-0 bg-slate-950/95 border-b border-slate-800 p-3 z-30 backdrop-blur-xl animate-fade-in shadow-2xl">
-                    <form onSubmit={handleSearchSubmit} className="relative flex items-center gap-2">
+                <div className="fixed left-0 right-0 top-16 z-30 border-b border-white/[0.06] bg-obsidian-950/95 p-4 backdrop-blur-2xl md:hidden">
+                    <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
                         <div className="relative flex-1">
-                            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <Search className="pointer-events-none absolute left-4 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-600" />
                             <input
                                 type="text"
                                 autoFocus
                                 value={searchQuery || ''}
                                 onChange={handleSearchChange}
-                                placeholder="Search 3,200+ games..."
-                                className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                                placeholder="Search the collection"
+                                className="w-full rounded-full border border-white/[0.08] bg-white/[0.03] py-2.5 pl-10 pr-4 text-[13px] font-light text-white placeholder-slate-600 focus:border-gold-400/35 focus:outline-none"
                             />
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => setIsMobileSearchOpen(false)}
-                            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white text-xs font-bold"
-                        >
-                            <X className="w-4 h-4" />
+                        <button type="button" onClick={() => setIsMobileSearchOpen(false)} className={iconButton}>
+                            <X className="h-4 w-4" />
                         </button>
                     </form>
 
-                    {/* Mobile Autocomplete Results */}
                     {searchResults.length > 0 && searchQuery && searchQuery.trim().length >= 2 && (
-                        <div className="mt-2 space-y-1 max-h-60 overflow-y-auto bg-slate-900 rounded-xl p-2 border border-slate-800">
-                            {searchResults.map(g => (
-                                <Link
-                                    key={g.id}
-                                    href={route('game.play', { slug: g.slug })}
-                                    onClick={(e) => {
-                                        setIsMobileSearchOpen(false);
-                                        if (!auth.user) {
-                                            e.preventDefault();
-                                            onOpenAuth('register');
-                                        }
-                                    }}
-                                    className="flex items-center justify-between p-2 hover:bg-slate-800 rounded-lg"
-                                >
-                                    <div className="flex items-center gap-2.5 min-w-0">
-                                        <img src={g.cover_image} alt={g.title} className="w-7 h-7 rounded object-cover" />
-                                        <div className="min-w-0">
-                                            <p className="text-xs font-black text-white truncate">{g.title}</p>
-                                            <p className="text-[10px] text-slate-400">{g.provider_code || 'GGR API'}</p>
-                                        </div>
-                                    </div>
-                                    <Badge variant="gold" className="text-[9px] px-2 py-0.5">PLAY</Badge>
-                                </Link>
-                            ))}
+                        <div className="mt-3 max-h-64 space-y-0.5 overflow-y-auto rounded-2xl border border-white/[0.06] bg-obsidian-900/80 p-2">
+                            {searchResults.map(g => renderResult(g, () => setIsMobileSearchOpen(false)))}
                         </div>
                     )}
                 </div>
             )}
 
-            {/* Store Modal */}
             <StoreModal
                 isOpen={isStoreOpen}
                 onClose={() => setIsStoreOpen(false)}
@@ -412,14 +343,8 @@ export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSe
                 onOpenAuth={onOpenAuth}
             />
 
-            {/* Referral Modal */}
-            <ReferralModal
-                isOpen={isReferralOpen}
-                onClose={() => setIsReferralOpen(false)}
-                user={auth.user}
-            />
+            <ReferralModal isOpen={isReferralOpen} onClose={() => setIsReferralOpen(false)} user={auth.user} />
 
-            {/* Daily Wheel Modal */}
             <DailyWheelModal
                 isOpen={isWheelOpen}
                 onClose={() => setIsWheelOpen(false)}
@@ -428,4 +353,3 @@ export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSe
         </>
     );
 }
-

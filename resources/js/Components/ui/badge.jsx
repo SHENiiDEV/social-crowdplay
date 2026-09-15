@@ -3,21 +3,20 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
 const badgeVariants = cva(
-    'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider transition-all',
+    'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-[0.18em] transition-all backdrop-blur-md',
     {
         variants: {
             variant: {
-                gold: 'bg-amber-500/15 text-amber-300 border border-amber-500/30',
-                cyan: 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30',
-                purple: 'bg-purple-500/15 text-purple-300 border border-purple-500/30',
-                emerald: 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30',
-                danger: 'bg-rose-500/15 text-rose-300 border border-rose-500/30',
-                muted: 'bg-slate-800/80 text-slate-300 border border-slate-700/60',
+                gold: 'bg-gold-400/10 text-gold-200 border border-gold-400/28',
+                solid: 'bg-gradient-to-b from-gold-200 to-gold-500 text-obsidian-950 border border-gold-100/60 shadow-[0_8px_20px_-10px_rgba(201,159,63,0.8)]',
+                cyan: 'bg-white/[0.05] text-pearl-400 border border-white/10',
+                purple: 'bg-white/[0.05] text-pearl-400 border border-white/10',
+                emerald: 'bg-jade-400/10 text-jade-400 border border-jade-400/25',
+                danger: 'bg-rose-500/10 text-rose-300 border border-rose-500/25',
+                muted: 'bg-black/45 text-slate-300 border border-white/10',
             },
         },
-        defaultVariants: {
-            variant: 'gold',
-        },
+        defaultVariants: { variant: 'gold' },
     }
 );
 

@@ -8,11 +8,9 @@ import { LiveFeed } from '../Components/Home/LiveFeed';
 import StoreModal from '../Components/Modals/StoreModal';
 import { JackpotWinModal } from '../Components/Modals/JackpotWinModal';
 import AuthModal from '../Components/AuthModal';
-import { 
-    Sparkles, Trophy, Flame, Shield, ArrowRight, Dices, Users, Filter, 
-    Heart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight 
+import {
+    Sparkles, Spade, Heart, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
 } from 'lucide-react';
-import { Badge } from '../Components/ui/badge';
 import { Button } from '../Components/ui/button';
 
 export default function Home({ games = [], currentCategory = 'All', categories = [], jackpotAmount = 1284959.92 }) {
@@ -27,7 +25,6 @@ export default function Home({ games = [], currentCategory = 'All', categories =
     const [favoriteIds, setFavoriteIds] = useState([]);
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
 
-    // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(24);
 
@@ -36,48 +33,21 @@ export default function Home({ games = [], currentCategory = 'All', categories =
             fetch('/api/favorites')
                 .then(res => res.json())
                 .then(data => {
-                    if (data && Array.isArray(data.favorite_ids)) {
-                        setFavoriteIds(data.favorite_ids);
-                    }
+                    if (data && Array.isArray(data.favorite_ids)) setFavoriteIds(data.favorite_ids);
                 })
                 .catch(() => {});
         }
     }, [auth.user]);
 
-    // Reset pagination to page 1 on filter or search changes
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery, selectedProvider, currentCategory, showOnlyFavorites]);
 
-    const handleTriggerJackpot = async () => {
-        try {
-            const response = await fetch('/api/jackpot/claim', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-            });
-            const data = await response.json();
-            if (data && data.won_amount) {
-                setWonJackpotAmount(data.won_amount);
-            }
-            setIsJackpotOpen(true);
-        } catch (e) {
-            setIsJackpotOpen(true);
-        }
-    };
-
     const handleFavToggle = (gameId, isFav) => {
-        if (isFav) {
-            setFavoriteIds(prev => [...prev, gameId]);
-        } else {
-            setFavoriteIds(prev => prev.filter(id => id !== gameId));
-        }
+        setFavoriteIds(prev => (isFav ? [...prev, gameId] : prev.filter(id => id !== gameId)));
     };
 
     const providers = ['ALL', 'PRAGMATIC', 'EVOLUTION', 'PGSOFT', 'HACKSAW', 'SPRIBE', 'PLAYNGO', 'AMATIC', 'EGT'];
-
     const allCategories = categories.includes('Favorites') ? categories : ['Favorites', ...categories];
 
     const filteredGames = games.filter(game => {
@@ -89,9 +59,7 @@ export default function Home({ games = [], currentCategory = 'All', categories =
             ? true
             : (game.category === currentCategory);
 
-        const matchesProvider = selectedProvider === 'ALL'
-            ? true
-            : (game.provider_code === selectedProvider);
+        const matchesProvider = selectedProvider === 'ALL' ? true : (game.provider_code === selectedProvider);
 
         const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (game.provider_code && game.provider_code.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -99,7 +67,6 @@ export default function Home({ games = [], currentCategory = 'All', categories =
         return matchesFavorites && matchesCategory && matchesProvider && matchesSearch;
     });
 
-    // Pagination calculations
     const totalGames = filteredGames.length;
     const totalPages = Math.max(1, Math.ceil(totalGames / perPage));
     const startIndex = (currentPage - 1) * perPage;
@@ -110,9 +77,7 @@ export default function Home({ games = [], currentCategory = 'All', categories =
         if (newPage >= 1 && newPage <= totalPages) {
             setCurrentPage(newPage);
             const el = document.getElementById('games-catalog');
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
 
@@ -120,14 +85,12 @@ export default function Home({ games = [], currentCategory = 'All', categories =
         const pages = [];
         if (totalPages <= 7) {
             for (let i = 1; i <= totalPages; i++) pages.push(i);
+        } else if (currentPage <= 4) {
+            pages.push(1, 2, 3, 4, 5, '...', totalPages);
+        } else if (currentPage >= totalPages - 3) {
+            pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
         } else {
-            if (currentPage <= 4) {
-                pages.push(1, 2, 3, 4, 5, '...', totalPages);
-            } else if (currentPage >= totalPages - 3) {
-                pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-            } else {
-                pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
-            }
+            pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
         }
         return pages;
     };
@@ -138,66 +101,70 @@ export default function Home({ games = [], currentCategory = 'All', categories =
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
         >
-            <Head title="CROWDPLAY Social Casino - Play 3,200+ Slots & Live Casino Games" />
+            <Head title="CROWDPLAY Social Casino — 3,200+ Slots & Live Tables" />
 
-            {/* Flash Notifications */}
+            {/* Flash */}
             {flash.success && (
-                <div className="mb-6 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-extrabold text-sm flex items-center gap-2 shadow-lg">
-                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                <div className="mb-6 flex items-center gap-2.5 rounded-2xl border border-jade-400/25 bg-jade-400/[0.07] px-4 py-3.5 text-[13px] font-medium text-jade-400">
+                    <Sparkles className="h-4 w-4" />
                     <span>{flash.success}</span>
                 </div>
             )}
             {flash.error && (
-                <div className="mb-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 font-extrabold text-sm flex items-center gap-2 shadow-lg">
-                    <span>{flash.error}</span>
+                <div className="mb-6 rounded-2xl border border-rose-500/25 bg-rose-500/[0.07] px-4 py-3.5 text-[13px] font-medium text-rose-300">
+                    {flash.error}
                 </div>
             )}
 
-            {/* Bento Hero Banner */}
-            <HeroBanner
-                initialJackpot={jackpotAmount}
-                onOpenStore={() => setIsStoreOpen(true)}
-            />
+            <HeroBanner initialJackpot={jackpotAmount} onOpenStore={() => setIsStoreOpen(true)} />
 
-            {/* Live Winners Feed Widget */}
             <LiveFeed />
 
-            {/* Category & Provider Navigation Section */}
-            <div id="games-catalog" className="space-y-4 sm:space-y-6 mb-8 scroll-mt-20 sm:scroll-mt-24">
-                {/* Category Pills Bar */}
-                <div className="flex items-center justify-between border-b border-slate-800/80 pb-3 sm:pb-4 overflow-x-auto gap-3 -mx-4 px-4 sm:mx-0 sm:px-0">
-                    <div className="flex items-center gap-2 shrink-0">
+            {/* ---------- Catalogue ---------- */}
+            <div id="games-catalog" className="scroll-mt-24 sm:scroll-mt-28">
+                {/* Section head */}
+                <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <span className="eyebrow">The collection</span>
+                        <h2 className="mt-2 font-display text-2xl sm:text-3xl font-light tracking-[-0.01em] text-white">
+                            Browse the <em className="not-italic text-gold">full floor</em>
+                        </h2>
+                    </div>
+                    <p className="font-mono num text-[11px] uppercase tracking-[0.18em] text-slate-600">
+                        {totalGames.toLocaleString('en-US')} titles available
+                    </p>
+                </div>
+
+                {/* Category rail */}
+                <div className="no-scrollbar -mx-4 mb-5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                    <div className="flex items-center gap-1.5 border-b border-white/[0.06] pb-4">
                         {allCategories.map((cat) => {
                             const isActive = currentCategory === cat;
                             return (
                                 <Link
                                     key={cat}
                                     href={route('home', { category: cat })}
-                                    className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                                    className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] transition-all duration-300 ${
                                         isActive
-                                            ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-lg shadow-amber-500/20 scale-105'
-                                            : 'bg-slate-900/80 text-slate-400 border border-slate-800/80 hover:text-white hover:border-slate-700'
+                                            ? 'lux-btn-gold'
+                                            : 'border border-white/[0.07] text-slate-500 hover:border-gold-400/30 hover:text-gold-200'
                                     }`}
                                 >
-                                    {cat === 'Favorites' && <Heart className={`w-3.5 h-3.5 ${isActive ? 'fill-slate-950 text-slate-950' : 'text-rose-500 fill-rose-500'}`} />}
-                                    <span>{cat}</span>
+                                    {cat === 'Favorites' && (
+                                        <Heart className={`h-3 w-3 ${isActive ? 'fill-current' : 'text-gold-400/70'}`} />
+                                    )}
+                                    <span className="relative z-10">{cat}</span>
                                 </Link>
                             );
                         })}
                     </div>
-
-                    <div className="hidden sm:flex items-center gap-2 text-xs font-black text-slate-400 whitespace-nowrap">
-                        <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
-                        <span>{totalGames} Available Games</span>
-                    </div>
                 </div>
 
-                {/* Provider Filter Tabs & Per-Page Controls */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
-                    <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
-                        <span className="text-[10px] sm:text-[11px] font-black uppercase text-slate-500 mr-1 flex items-center gap-1 shrink-0">
-                            <Filter className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-                            <span>Provider:</span>
+                {/* Provider + per-page */}
+                <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="no-scrollbar -mx-4 flex items-center gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                        <span className="shrink-0 pr-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-slate-600">
+                            Provider
                         </span>
                         {providers.map((prov) => {
                             const isSelected = selectedProvider === prov;
@@ -205,10 +172,10 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                                 <button
                                     key={prov}
                                     onClick={() => setSelectedProvider(prov)}
-                                    className={`px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wide transition-all whitespace-nowrap shrink-0 ${
+                                    className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] transition-all duration-300 ${
                                         isSelected
-                                            ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
-                                            : 'bg-slate-950/60 text-slate-400 border border-slate-800/60 hover:text-slate-200'
+                                            ? 'border-gold-400/40 bg-gold-400/10 text-gold-200'
+                                            : 'border-white/[0.06] text-slate-600 hover:border-white/15 hover:text-slate-300'
                                     }`}
                                 >
                                     {prov}
@@ -218,19 +185,16 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                     </div>
 
                     {totalGames > 0 && (
-                        <div className="flex items-center gap-2 text-xs text-slate-400 self-end sm:self-auto sm:ml-auto">
-                            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500">Per page:</span>
+                        <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                            <span className="pr-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-slate-600">Show</span>
                             {[16, 24, 32, 48].map((size) => (
                                 <button
                                     key={size}
-                                    onClick={() => {
-                                        setPerPage(size);
-                                        setCurrentPage(1);
-                                    }}
-                                    className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-bold transition-all ${
+                                    onClick={() => { setPerPage(size); setCurrentPage(1); }}
+                                    className={`h-7 min-w-[2rem] rounded-full border px-2 font-mono num text-[10px] transition-all ${
                                         perPage === size
-                                            ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
-                                            : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                                            ? 'border-gold-400/40 bg-gold-400/10 text-gold-200'
+                                            : 'border-white/[0.06] text-slate-600 hover:border-white/15 hover:text-slate-300'
                                     }`}
                                 >
                                     {size}
@@ -239,114 +203,107 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                         </div>
                     )}
                 </div>
+
+                {/* Grid */}
+                {paginatedGames.length > 0 ? (
+                    <div className="space-y-10">
+                        <div className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+                            {paginatedGames.map((game, index) => (
+                                <GameCard
+                                    key={game.id}
+                                    game={game}
+                                    index={index}
+                                    isFavInitial={favoriteIds.includes(game.id)}
+                                    onFavToggle={handleFavToggle}
+                                    onOpenAuth={(mode) => setAuthModal({ open: true, mode })}
+                                />
+                            ))}
+                        </div>
+
+                        {totalPages > 1 && (
+                            <div className="flex flex-col items-center justify-between gap-5 rounded-2xl border border-white/[0.06] bg-obsidian-900/50 px-5 py-5 sm:flex-row sm:px-7">
+                                <p className="font-mono num text-[11px] tracking-wide text-slate-600">
+                                    <span className="text-slate-300">{startIndex + 1}</span>
+                                    <span className="mx-1.5">—</span>
+                                    <span className="text-slate-300">{endIndex}</span>
+                                    <span className="mx-2 text-slate-700">of</span>
+                                    <span className="text-gold-300">{totalGames.toLocaleString('en-US')}</span>
+                                </p>
+
+                                <div className="flex flex-wrap items-center justify-center gap-1.5">
+                                    <button
+                                        onClick={() => handlePageChange(1)}
+                                        disabled={currentPage === 1}
+                                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.06] text-slate-500 transition-all hover:border-white/15 hover:text-slate-200 disabled:pointer-events-none disabled:opacity-25"
+                                        title="First page"
+                                    >
+                                        <ChevronsLeft className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => handlePageChange(currentPage - 1)}
+                                        disabled={currentPage === 1}
+                                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.06] text-slate-500 transition-all hover:border-white/15 hover:text-slate-200 disabled:pointer-events-none disabled:opacity-25"
+                                    >
+                                        <ChevronLeft className="h-4 w-4" />
+                                    </button>
+
+                                    {getPageNumbers().map((page, i) => {
+                                        if (page === '...') {
+                                            return (
+                                                <span key={`dots-${i}`} className="select-none px-1 text-slate-700">···</span>
+                                            );
+                                        }
+                                        const isActive = currentPage === page;
+                                        return (
+                                            <button
+                                                key={`page-${page}`}
+                                                onClick={() => handlePageChange(page)}
+                                                className={`h-9 min-w-[2.25rem] rounded-full font-mono num text-[11px] transition-all ${
+                                                    isActive
+                                                        ? 'lux-btn-gold'
+                                                        : 'border border-white/[0.06] text-slate-500 hover:border-white/15 hover:text-slate-200'
+                                                }`}
+                                            >
+                                                <span className="relative z-10">{page}</span>
+                                            </button>
+                                        );
+                                    })}
+
+                                    <button
+                                        onClick={() => handlePageChange(currentPage + 1)}
+                                        disabled={currentPage === totalPages}
+                                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.06] text-slate-500 transition-all hover:border-white/15 hover:text-slate-200 disabled:pointer-events-none disabled:opacity-25"
+                                    >
+                                        <ChevronRight className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => handlePageChange(totalPages)}
+                                        disabled={currentPage === totalPages}
+                                        className="flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.06] text-slate-500 transition-all hover:border-white/15 hover:text-slate-200 disabled:pointer-events-none disabled:opacity-25"
+                                        title="Last page"
+                                    >
+                                        <ChevronsRight className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="rounded-3xl border border-white/[0.06] bg-obsidian-900/50 px-6 py-24 text-center">
+                        <Spade className="mx-auto h-8 w-8 text-gold-400/40" />
+                        <h3 className="mt-5 font-display text-2xl font-light text-white">Nothing on this table</h3>
+                        <p className="mx-auto mt-3 max-w-sm text-[13px] font-light leading-relaxed text-slate-500">
+                            No titles matched your filters. Reset them to browse all 3,200 games.
+                        </p>
+                        <div className="mt-7 flex justify-center">
+                            <Button variant="glass" size="sm" onClick={() => { setSelectedProvider('ALL'); setSearchQuery(''); }}>
+                                Reset filters
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
 
-            {/* Game Cards Grid */}
-            {paginatedGames.length > 0 ? (
-                <div className="space-y-8 sm:space-y-10">
-                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-                        {paginatedGames.map((game, index) => (
-                            <GameCard
-                                key={game.id}
-                                game={game}
-                                index={index}
-                                isFavInitial={favoriteIds.includes(game.id)}
-                                onFavToggle={handleFavToggle}
-                                onOpenAuth={(mode) => setAuthModal({ open: true, mode })}
-                            />
-                        ))}
-                    </div>
-
-                    {/* Interactive Pagination Bar */}
-                    {totalPages > 1 && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-6 bg-slate-900/60 border border-slate-800 rounded-2xl sm:rounded-3xl backdrop-blur-sm shadow-xl">
-                            {/* Counter */}
-                            <div className="text-xs font-bold text-slate-400">
-                                Showing <span className="text-white font-extrabold">{startIndex + 1}</span> to{' '}
-                                <span className="text-white font-extrabold">{endIndex}</span> of{' '}
-                                <span className="text-amber-400 font-black">{totalGames}</span> games
-                            </div>
-
-                            {/* Page Controls */}
-                            <div className="flex items-center gap-1.5 flex-wrap justify-center">
-                                {/* First & Prev */}
-                                <button
-                                    onClick={() => handlePageChange(1)}
-                                    disabled={currentPage === 1}
-                                    className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                                    title="First page"
-                                >
-                                    <ChevronsLeft className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => handlePageChange(currentPage - 1)}
-                                    disabled={currentPage === 1}
-                                    className="px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-1"
-                                >
-                                    <ChevronLeft className="w-4 h-4" />
-                                    <span className="hidden sm:inline">Prev</span>
-                                </button>
-
-                                {/* Numbered Pages */}
-                                {getPageNumbers().map((page, i) => {
-                                    if (page === '...') {
-                                        return (
-                                            <span key={`dots-${i}`} className="px-2 text-slate-500 font-bold select-none">
-                                                ...
-                                            </span>
-                                        );
-                                    }
-                                    const isActive = currentPage === page;
-                                    return (
-                                        <button
-                                            key={`page-${page}`}
-                                            onClick={() => handlePageChange(page)}
-                                            className={`min-w-[38px] h-[38px] rounded-xl text-xs font-black transition-all ${
-                                                isActive
-                                                    ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 scale-105'
-                                                    : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
-                                            }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    );
-                                })}
-
-                                {/* Next & Last */}
-                                <button
-                                    onClick={() => handlePageChange(currentPage + 1)}
-                                    disabled={currentPage === totalPages}
-                                    className="px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-1"
-                                >
-                                    <span className="hidden sm:inline">Next</span>
-                                    <ChevronRight className="w-4 h-4" />
-                                </button>
-                                <button
-                                    onClick={() => handlePageChange(totalPages)}
-                                    disabled={currentPage === totalPages}
-                                    className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                                    title="Last page"
-                                >
-                                    <ChevronsRight className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            ) : (
-                <div className="text-center py-24 bg-slate-900/40 rounded-3xl border border-slate-800/80 space-y-4">
-                    <Dices className="w-12 h-12 text-slate-600 mx-auto" />
-                    <h3 className="text-lg font-black text-white">No Games Found</h3>
-                    <p className="text-xs text-slate-400 max-w-md mx-auto">
-                        No games matched your selected filter. Try resetting your search or exploring all 3,200+ games.
-                    </p>
-                    <Button variant="outline" size="sm" onClick={() => { setSelectedProvider('ALL'); setSearchQuery(''); }}>
-                        Reset Filters
-                    </Button>
-                </div>
-            )}
-
-            {/* Store Modal */}
             <StoreModal
                 isOpen={isStoreOpen}
                 onClose={() => setIsStoreOpen(false)}
@@ -354,7 +311,6 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                 onOpenAuth={(mode) => setAuthModal({ open: true, mode })}
             />
 
-            {/* Jackpot Win Modal */}
             <JackpotWinModal
                 isOpen={isJackpotOpen}
                 onClose={() => setIsJackpotOpen(false)}
@@ -362,7 +318,6 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                 amount={wonJackpotAmount}
             />
 
-            {/* Auth Modal */}
             <AuthModal
                 isOpen={authModal.open}
                 onClose={() => setAuthModal({ open: false, mode: 'login' })}

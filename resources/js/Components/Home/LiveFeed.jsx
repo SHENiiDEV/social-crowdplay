@@ -1,68 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Trophy, Sparkles, Flame, ArrowUpRight } from 'lucide-react';
-import { Badge } from '../ui/badge';
+import { ArrowUpRight } from 'lucide-react';
 
+/**
+ * Win tiers expressed purely through metal tones — gold, champagne, pearl —
+ * so the rail reads as one material instead of a rainbow of alerts.
+ */
 const getWinTier = (item) => {
     const win = Number(item.win || 0);
     const multiplier = Number(item.multiplier || 1);
 
     if (win >= 5000 || multiplier >= 100) {
         return {
-            tier: 'epic',
-            badgeText: `${multiplier.toFixed(1)}x EPIC WIN`,
-            badgeStyle: 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-slate-950 font-black shadow-lg shadow-amber-500/30 animate-pulse border-amber-300',
-            cardBg: 'bg-gradient-to-r from-amber-950/60 via-purple-950/40 to-slate-900 border-amber-400/80 shadow-2xl shadow-amber-500/20 ring-1 ring-amber-400/40',
-            winText: 'text-amber-300 drop-shadow-[0_0_10px_rgba(251,191,36,0.8)] font-black',
-            avatarBg: 'bg-gradient-to-tr from-amber-400 via-rose-500 to-yellow-300 text-slate-950 ring-2 ring-amber-400/60 font-black',
-            glowColor: 'text-amber-300',
+            label: `${multiplier.toFixed(0)}× Epic`,
+            card: 'border-gold-400/40 bg-gradient-to-br from-gold-900/50 via-obsidian-850 to-obsidian-900 shadow-[0_26px_60px_-34px_rgba(201,159,63,0.6)]',
+            badge: 'border-gold-300/50 bg-gold-400/15 text-gold-200',
+            amount: 'text-gold-200',
+            avatar: 'bg-gradient-to-br from-gold-200 to-gold-500 text-obsidian-950 border-gold-100/50',
         };
     }
 
     if (win >= 2000 || multiplier >= 50) {
         return {
-            tier: 'mega',
-            badgeText: `${multiplier.toFixed(1)}x MEGA WIN`,
-            badgeStyle: 'bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white font-black shadow-md shadow-purple-500/25 border-purple-300',
-            cardBg: 'bg-gradient-to-r from-purple-950/50 via-slate-900 to-slate-900 border-purple-500/60 shadow-xl shadow-purple-500/15',
-            winText: 'text-purple-300 drop-shadow-[0_0_8px_rgba(192,132,252,0.7)] font-black',
-            avatarBg: 'bg-gradient-to-tr from-purple-500 via-pink-500 to-indigo-600 text-white ring-1 ring-purple-400/50 font-black',
-            glowColor: 'text-purple-400',
+            label: `${multiplier.toFixed(0)}× Mega`,
+            card: 'border-gold-400/22 bg-gradient-to-br from-obsidian-800 to-obsidian-900',
+            badge: 'border-gold-400/28 bg-gold-400/8 text-gold-300',
+            amount: 'text-gold-300',
+            avatar: 'bg-gradient-to-br from-gold-400/80 to-gold-700 text-obsidian-950 border-gold-300/30',
         };
     }
 
     if (win >= 500 || multiplier >= 25) {
         return {
-            tier: 'big',
-            badgeText: `${multiplier.toFixed(1)}x BIG WIN`,
-            badgeStyle: 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-black',
-            cardBg: 'bg-gradient-to-r from-cyan-950/40 via-slate-900 to-slate-900 border-cyan-500/40 hover:border-cyan-400/80 shadow-md shadow-cyan-500/10',
-            winText: 'text-cyan-300 drop-shadow-[0_0_6px_rgba(34,211,238,0.6)] font-bold',
-            avatarBg: 'bg-gradient-to-tr from-cyan-500 to-blue-600 text-white font-black',
-            glowColor: 'text-cyan-400',
-        };
-    }
-
-    if (win >= 100 || multiplier >= 10) {
-        return {
-            tier: 'nice',
-            badgeText: `${multiplier.toFixed(1)}x WIN`,
-            badgeStyle: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold',
-            cardBg: 'bg-slate-900/90 border-emerald-500/30 hover:border-emerald-500/50',
-            winText: 'text-emerald-400 font-bold',
-            avatarBg: 'bg-gradient-to-tr from-emerald-500 to-teal-600 text-white font-bold',
-            glowColor: 'text-emerald-400',
+            label: `${multiplier.toFixed(0)}× Big`,
+            card: 'border-white/[0.08] bg-obsidian-900/90',
+            badge: 'border-white/10 bg-white/[0.04] text-pearl-400',
+            amount: 'text-pearl-400',
+            avatar: 'bg-gradient-to-br from-slate-300/80 to-slate-500 text-obsidian-950 border-white/20',
         };
     }
 
     return {
-        tier: 'standard',
-        badgeText: item.time || 'just now',
-        badgeStyle: 'text-slate-500 font-medium',
-        cardBg: 'bg-slate-900/80 border-slate-800 hover:border-slate-700',
-        winText: 'text-emerald-400/90 font-medium',
-        avatarBg: 'bg-slate-800 text-slate-300 border border-slate-700 font-bold',
-        glowColor: 'text-emerald-400',
+        label: item.time || 'just now',
+        card: 'border-white/[0.06] bg-obsidian-900/70',
+        badge: 'border-transparent bg-transparent text-slate-600',
+        amount: 'text-jade-400/90',
+        avatar: 'bg-white/[0.06] text-slate-400 border-white/10',
     };
 };
 
@@ -73,11 +55,9 @@ export function LiveFeed() {
         fetch('/api/live-wins')
             .then(res => res.json())
             .then(data => {
-                if (data && data.wins) {
-                    setWins(data.wins);
-                }
+                if (data && data.wins) setWins(data.wins);
             })
-            .catch(err => console.error('Live feed error:', err));
+            .catch(() => {});
     };
 
     useEffect(() => {
@@ -86,91 +66,83 @@ export function LiveFeed() {
         return () => clearInterval(interval);
     }, []);
 
-    // Duplicate list for seamless infinite horizontal slider loop
     const displayList = wins.length > 0 ? [...wins, ...wins] : [];
 
     return (
-        <div className="w-full bg-slate-950/90 border border-slate-800/80 rounded-3xl p-5 shadow-2xl mb-10 overflow-hidden relative">
-            {/* Ambient Glows */}
-            <div className="absolute top-0 right-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/80 px-2">
-                <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                        <Trophy className="w-4 h-4" />
+        <section className="relative mb-10 sm:mb-14">
+            {/* Section header */}
+            <div className="mb-5 flex items-end justify-between gap-4 px-1">
+                <div>
+                    <div className="flex items-center gap-2.5">
+                        <span className="relative flex h-1.5 w-1.5">
+                            <span className="absolute inline-flex h-full w-full rounded-full bg-jade-400 opacity-70"
+                                  style={{ animation: 'lux-pulse-dot 2s ease-in-out infinite' }} />
+                            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-jade-400" />
+                        </span>
+                        <span className="eyebrow">Live winners</span>
                     </div>
-                    <div>
-                        <h3 className="text-base font-black text-white flex items-center gap-2">
-                            <span>LIVE COMMUNITY WINNERS</span>
-                            <span className="flex h-2 w-2 relative">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                            </span>
-                        </h3>
-                        <p className="text-[11px] text-slate-400 font-medium">Real-time payouts across all games</p>
-                    </div>
+                    <h2 className="mt-2 font-display text-2xl sm:text-3xl font-light text-white tracking-[-0.01em]">
+                        Payouts happening <em className="not-italic text-gold">right now</em>
+                    </h2>
                 </div>
 
-                <Badge variant="gold" className="hidden sm:inline-flex">
-                    <Sparkles className="w-3 h-3" />
-                    <span>24/7 LIVE FEED</span>
-                </Badge>
+                <span className="hidden sm:block text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-600">
+                    24 / 7 feed
+                </span>
             </div>
 
-            {/* Horizontal Continuous Marquee Slider */}
-            <div className="relative w-full overflow-hidden py-1">
-                {/* Gradient Fades on Left & Right Edges */}
-                <div className="absolute top-0 bottom-0 left-0 w-12 bg-gradient-to-r from-slate-950 to-transparent z-10 pointer-events-none" />
-                <div className="absolute top-0 bottom-0 right-0 w-12 bg-gradient-to-l from-slate-950 to-transparent z-10 pointer-events-none" />
+            {/* Rail */}
+            <div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-obsidian-950/60 py-5">
+                <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 sm:w-28 bg-gradient-to-r from-[#06070a] to-transparent" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 sm:w-28 bg-gradient-to-l from-[#06070a] to-transparent" />
 
-                <motion.div
-                    className="flex gap-4 w-max cursor-pointer"
-                    animate={{ x: ['0%', '-50%'] }}
-                    transition={{
-                        ease: 'linear',
-                        duration: 35,
-                        repeat: Infinity,
-                    }}
-                >
-                    {displayList.map((item, idx) => {
-                        const tierInfo = getWinTier(item);
+                {displayList.length > 0 ? (
+                    <div className="flex w-max gap-4 px-5 lux-marquee">
+                        {displayList.map((item, idx) => {
+                            const tier = getWinTier(item);
 
-                        return (
-                            <div
-                                key={`${item.id}-${idx}`}
-                                className={`w-64 border rounded-2xl p-3.5 shadow-xl transition-all duration-200 shrink-0 flex items-center gap-3 group ${tierInfo.cardBg}`}
-                            >
-                                {/* User Initial Avatar */}
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xs shadow-md shrink-0 ${tierInfo.avatarBg}`}>
-                                    {item.user.charAt(0).toUpperCase()}
-                                </div>
-
-                                <div className="min-w-0 flex-1 space-y-0.5">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-xs font-black text-white truncate">{item.user}</span>
-                                        <span className="text-[9px] font-bold text-slate-500 uppercase">{item.provider}</span>
+                            return (
+                                <article
+                                    key={`${item.id}-${idx}`}
+                                    className={`flex w-[17rem] shrink-0 items-center gap-3.5 rounded-2xl border p-4 transition-colors duration-300 ${tier.card}`}
+                                >
+                                    <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border text-sm font-semibold ${tier.avatar}`}>
+                                        {item.user.charAt(0).toUpperCase()}
                                     </div>
 
-                                    <p className="text-[11px] font-medium text-slate-400 truncate">{item.game}</p>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-baseline justify-between gap-2">
+                                            <span className="truncate text-[13px] font-semibold text-white">{item.user}</span>
+                                            <span className="shrink-0 text-[8px] font-semibold uppercase tracking-[0.16em] text-slate-600">
+                                                {item.provider}
+                                            </span>
+                                        </div>
 
-                                    <div className="flex items-center justify-between pt-1">
-                                        <span className={`text-xs font-mono flex items-center gap-0.5 ${tierInfo.winText}`}>
-                                            +{Number(item.win).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SC
-                                            <ArrowUpRight className="w-3 h-3" />
-                                        </span>
+                                        <p className="mt-0.5 truncate text-[11px] font-light text-slate-500">{item.game}</p>
 
-                                        <span className={`text-[9px] px-2 py-0.5 rounded-full uppercase tracking-tight ${tierInfo.badgeStyle}`}>
-                                            {tierInfo.badgeText}
-                                        </span>
+                                        <div className="mt-2.5 flex items-center justify-between gap-2">
+                                            <span className={`flex items-center gap-0.5 font-mono num text-[13px] font-semibold ${tier.amount}`}>
+                                                +{Number(item.win).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                                <ArrowUpRight className="h-3 w-3 opacity-60" />
+                                            </span>
+
+                                            <span className={`rounded-full border px-2 py-0.5 text-[8px] font-semibold uppercase tracking-[0.14em] ${tier.badge}`}>
+                                                {tier.label}
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </motion.div>
+                                </article>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div className="flex gap-4 px-5">
+                        {[0, 1, 2, 3, 4].map(i => (
+                            <div key={i} className="h-[92px] w-[17rem] shrink-0 animate-pulse rounded-2xl border border-white/[0.05] bg-white/[0.02]" />
+                        ))}
+                    </div>
+                )}
             </div>
-        </div>
+        </section>
     );
 }
-
