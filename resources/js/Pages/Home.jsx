@@ -163,17 +163,17 @@ export default function Home({ games = [], currentCategory = 'All', categories =
             <LiveFeed />
 
             {/* Category & Provider Navigation Section */}
-            <div id="games-catalog" className="space-y-6 mb-8 scroll-mt-24">
+            <div id="games-catalog" className="space-y-4 sm:space-y-6 mb-8 scroll-mt-20 sm:scroll-mt-24">
                 {/* Category Pills Bar */}
-                <div className="flex items-center justify-between border-b border-slate-800/80 pb-4 overflow-x-auto gap-3">
-                    <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between border-b border-slate-800/80 pb-3 sm:pb-4 overflow-x-auto gap-3 -mx-4 px-4 sm:mx-0 sm:px-0">
+                    <div className="flex items-center gap-2 shrink-0">
                         {allCategories.map((cat) => {
                             const isActive = currentCategory === cat;
                             return (
                                 <Link
                                     key={cat}
                                     href={route('home', { category: cat })}
-                                    className={`px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                                    className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-1.5 ${
                                         isActive
                                             ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-lg shadow-amber-500/20 scale-105'
                                             : 'bg-slate-900/80 text-slate-400 border border-slate-800/80 hover:text-white hover:border-slate-700'
@@ -193,10 +193,10 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                 </div>
 
                 {/* Provider Filter Tabs & Per-Page Controls */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pb-2">
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                        <span className="text-[11px] font-black uppercase text-slate-500 mr-1 flex items-center gap-1">
-                            <Filter className="w-3.5 h-3.5" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+                        <span className="text-[10px] sm:text-[11px] font-black uppercase text-slate-500 mr-1 flex items-center gap-1 shrink-0">
+                            <Filter className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
                             <span>Provider:</span>
                         </span>
                         {providers.map((prov) => {
@@ -205,7 +205,7 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                                 <button
                                     key={prov}
                                     onClick={() => setSelectedProvider(prov)}
-                                    className={`px-3.5 py-1.5 rounded-xl text-[11px] font-extrabold uppercase tracking-wide transition-all ${
+                                    className={`px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wide transition-all whitespace-nowrap shrink-0 ${
                                         isSelected
                                             ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm'
                                             : 'bg-slate-950/60 text-slate-400 border border-slate-800/60 hover:text-slate-200'
@@ -218,8 +218,8 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                     </div>
 
                     {totalGames > 0 && (
-                        <div className="flex items-center gap-2 text-xs text-slate-400 ml-auto">
-                            <span className="text-[11px] font-bold text-slate-500">Per page:</span>
+                        <div className="flex items-center gap-2 text-xs text-slate-400 self-end sm:self-auto sm:ml-auto">
+                            <span className="text-[10px] sm:text-[11px] font-bold text-slate-500">Per page:</span>
                             {[16, 24, 32, 48].map((size) => (
                                 <button
                                     key={size}
@@ -227,7 +227,7 @@ export default function Home({ games = [], currentCategory = 'All', categories =
                                         setPerPage(size);
                                         setCurrentPage(1);
                                     }}
-                                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                                    className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[11px] sm:text-xs font-bold transition-all ${
                                         perPage === size
                                             ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
                                             : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
@@ -243,8 +243,8 @@ export default function Home({ games = [], currentCategory = 'All', categories =
 
             {/* Game Cards Grid */}
             {paginatedGames.length > 0 ? (
-                <div className="space-y-10">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="space-y-8 sm:space-y-10">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
                         {paginatedGames.map((game, index) => (
                             <GameCard
                                 key={game.id}
@@ -259,7 +259,7 @@ export default function Home({ games = [], currentCategory = 'All', categories =
 
                     {/* Interactive Pagination Bar */}
                     {totalPages > 1 && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 bg-slate-900/60 border border-slate-800 rounded-3xl backdrop-blur-sm shadow-xl">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-6 bg-slate-900/60 border border-slate-800 rounded-2xl sm:rounded-3xl backdrop-blur-sm shadow-xl">
                             {/* Counter */}
                             <div className="text-xs font-bold text-slate-400">
                                 Showing <span className="text-white font-extrabold">{startIndex + 1}</span> to{' '}

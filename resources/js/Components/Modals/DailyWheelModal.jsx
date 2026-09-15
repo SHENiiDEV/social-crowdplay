@@ -448,7 +448,7 @@ export function DailyWheelModal({ isOpen, onClose, onBalanceUpdate }) {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.7, y: 40 }}
                     transition={{ type: 'spring', stiffness: 100, damping: 16 }}
-                    className="relative w-full max-w-md bg-gradient-to-b from-slate-900/95 via-slate-950/98 to-slate-900/95 border border-amber-500/30 rounded-3xl p-5 sm:p-7 shadow-[0_0_100px_rgba(251,191,36,0.15),0_0_40px_rgba(6,182,212,0.1)] text-center overflow-hidden"
+                    className="relative w-full max-w-md bg-gradient-to-b from-slate-900/95 via-slate-950/98 to-slate-900/95 border border-amber-500/30 rounded-3xl p-5 sm:p-7 shadow-[0_0_100px_rgba(251,191,36,0.15),0_0_40px_rgba(6,182,212,0.1)] text-center max-h-[92vh] overflow-y-auto my-auto"
                 >
                     {/* Ambient glow orbs */}
                     <div className="absolute -top-20 -right-20 w-60 h-60 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none" />
@@ -505,7 +505,7 @@ export function DailyWheelModal({ isOpen, onClose, onBalanceUpdate }) {
                     </motion.div>
 
                     {/* Wheel Stage */}
-                    <div className="relative w-72 h-72 sm:w-80 sm:h-80 mx-auto flex items-center justify-center mb-4">
+                    <div className="relative w-64 h-64 sm:w-80 sm:h-80 mx-auto flex items-center justify-center mb-4">
                         {/* LED ring */}
                         <LedRing spinning={isSpinning} />
 

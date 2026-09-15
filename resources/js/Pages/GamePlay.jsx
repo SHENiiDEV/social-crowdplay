@@ -91,7 +91,7 @@ export default function GamePlay({ game, iframeUrl, sessionToken, isDemo }) {
                 {/* Game Iframe Container */}
                 <div
                     id="game-iframe-container"
-                    className="relative w-full aspect-[16/9] min-h-[580px] bg-slate-950 rounded-3xl overflow-hidden border border-slate-800 shadow-2xl"
+                    className="relative w-full h-[72vh] sm:h-[600px] md:h-auto md:aspect-[16/9] md:min-h-[580px] bg-slate-950 rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-800 shadow-2xl"
                 >
                     <iframe
                         src={iframeUrl}

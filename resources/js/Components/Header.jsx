@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Coins, PlusCircle, LogOut, Shield, Gift, Sparkles, User as UserIcon, Volume2, VolumeX, Trophy, Play } from 'lucide-react';
+import { Search, Coins, PlusCircle, LogOut, Shield, Gift, Sparkles, User as UserIcon, Volume2, VolumeX, Trophy, Menu, X, ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import Logo from './Logo';
 import StoreModal from './Modals/StoreModal';
 import { ReferralModal } from './Modals/ReferralModal';
 import { DailyWheelModal } from './Modals/DailyWheelModal';
 import { soundFx } from '../utils/soundFx';
 
-export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
+export default function Header({ onOpenAuth, onToggleSidebar, searchQuery, setSearchQuery }) {
     const { auth, games = [] } = usePage().props;
     const [userDropdown, setUserDropdown] = useState(false);
     const [isStoreOpen, setIsStoreOpen] = useState(false);
@@ -21,6 +22,7 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
     const [balanceDiff, setBalanceDiff] = useState(null);
     const [searchResults, setSearchResults] = useState([]);
     const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+    const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
     // Track balance differences to trigger floating animated badges & audio FX
     useEffect(() => {
@@ -46,8 +48,6 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
 
     // Live Balance Polling (every 2.5s) to reflect real-time GGR spin debits/wins in top nav
     useEffect(() => {
-
-
         if (!auth.user) return;
 
         const fetchBalance = async () => {
@@ -81,7 +81,6 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
         };
     }, [auth.user]);
 
-
     const handleSearchChange = (e) => {
         const query = e.target.value;
         setSearchQuery(query);
@@ -106,6 +105,7 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
     const handleSearchSubmit = (e) => {
         e.preventDefault();
         setShowSearchDropdown(false);
+        setIsMobileSearchOpen(false);
         window.location.href = route('home', { search: searchQuery });
     };
 
@@ -115,60 +115,89 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
 
     return (
         <>
-            <header className="h-20 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 fixed top-0 left-64 right-0 z-30 px-6 sm:px-8 flex items-center justify-between shadow-2xl">
-                {/* Search Input & Instant Autocomplete Dropdown */}
-                <div className="relative w-72 sm:w-96">
-                    <form onSubmit={handleSearchSubmit} className="relative w-full">
-                        <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                            type="text"
-                            value={searchQuery || ''}
-                            onChange={handleSearchChange}
-                            onFocus={() => searchQuery && searchQuery.trim().length >= 2 && setShowSearchDropdown(true)}
-                            onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
-                            placeholder="Search 3,200+ games, slots, baccarat..."
-                            className="w-full bg-slate-900/90 border border-slate-800/80 rounded-2xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/30 transition-all"
-                        />
-                    </form>
+            <header className="h-16 sm:h-20 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/80 fixed top-0 left-0 lg:left-64 right-0 z-30 px-3 sm:px-6 lg:px-8 flex items-center justify-between shadow-2xl transition-all duration-300">
+                {/* Left Section: Mobile Hamburger Toggle + Logo (on mobile) + Search on desktop */}
+                <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
+                    {/* Mobile Hamburger Menu Button */}
+                    <button
+                        type="button"
+                        onClick={onToggleSidebar}
+                        className="lg:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-400 hover:border-slate-700 transition-colors shrink-0"
+                        title="Open Menu"
+                    >
+                        <Menu className="w-5 h-5" />
+                    </button>
 
-                    {/* Instant Search Autocomplete Dropdown */}
-                    {showSearchDropdown && searchResults.length > 0 && (
-                        <div className="absolute top-12 left-0 right-0 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 space-y-1">
-                            <p className="px-3 py-1 text-[10px] font-black uppercase text-slate-500">Matching Games</p>
-                            {searchResults.map(g => (
-                                <Link
-                                    key={g.id}
-                                    href={route('game.play', { slug: g.slug })}
-                                    onClick={(e) => {
-                                        if (!auth.user) {
-                                            e.preventDefault();
-                                            setShowSearchDropdown(false);
-                                            onOpenAuth('register');
-                                        }
-                                    }}
-                                    className="flex items-center justify-between p-2 hover:bg-slate-800/80 rounded-xl transition-all group"
-                                >
-                                    <div className="flex items-center gap-3 min-w-0">
-                                        <img src={g.cover_image} alt={g.title} className="w-8 h-8 rounded-lg object-cover" />
-                                        <div className="min-w-0">
-                                            <p className="text-xs font-black text-white truncate group-hover:text-amber-400">{g.title}</p>
-                                            <p className="text-[10px] text-slate-400">{g.provider_code || 'GGR API'}</p>
+                    {/* Mobile Brand Logo */}
+                    <div className="lg:hidden shrink-0">
+                        <Link href={route('home')} className="block scale-90 sm:scale-100 origin-left">
+                            <Logo />
+                        </Link>
+                    </div>
+
+                    {/* Desktop Search Input & Instant Autocomplete Dropdown */}
+                    <div className="relative hidden md:block w-64 lg:w-80 xl:w-96">
+                        <form onSubmit={handleSearchSubmit} className="relative w-full">
+                            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                            <input
+                                type="text"
+                                value={searchQuery || ''}
+                                onChange={handleSearchChange}
+                                onFocus={() => searchQuery && searchQuery.trim().length >= 2 && setShowSearchDropdown(true)}
+                                onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
+                                placeholder="Search 3,200+ games..."
+                                className="w-full bg-slate-900/90 border border-slate-800/80 rounded-2xl pl-10 pr-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/30 transition-all"
+                            />
+                        </form>
+
+                        {/* Instant Search Autocomplete Dropdown */}
+                        {showSearchDropdown && searchResults.length > 0 && (
+                            <div className="absolute top-12 left-0 right-0 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 space-y-1">
+                                <p className="px-3 py-1 text-[10px] font-black uppercase text-slate-500">Matching Games</p>
+                                {searchResults.map(g => (
+                                    <Link
+                                        key={g.id}
+                                        href={route('game.play', { slug: g.slug })}
+                                        onClick={(e) => {
+                                            if (!auth.user) {
+                                                e.preventDefault();
+                                                setShowSearchDropdown(false);
+                                                onOpenAuth('register');
+                                            }
+                                        }}
+                                        className="flex items-center justify-between p-2 hover:bg-slate-800/80 rounded-xl transition-all group"
+                                    >
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <img src={g.cover_image} alt={g.title} className="w-8 h-8 rounded-lg object-cover" />
+                                            <div className="min-w-0">
+                                                <p className="text-xs font-black text-white truncate group-hover:text-amber-400">{g.title}</p>
+                                                <p className="text-[10px] text-slate-400">{g.provider_code || 'GGR API'}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <Badge variant="gold" className="text-[9px] px-2 py-0.5">PLAY</Badge>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
+                                        <Badge variant="gold" className="text-[9px] px-2 py-0.5">PLAY</Badge>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Right Side Navigation & User Actions */}
-                <div className="flex items-center gap-3 sm:gap-5">
+                <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+                    {/* Mobile Search Toggle Button */}
+                    <button
+                        onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+                        className="md:hidden w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-400 flex items-center justify-center transition-all"
+                        title="Search Games"
+                    >
+                        <Search className="w-4 h-4" />
+                    </button>
+
                     {/* Audio Mute Toggle Button */}
                     <button
                         onClick={handleToggleMute}
                         title={isMuted ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
-                        className="w-10 h-10 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-amber-400 flex items-center justify-center transition-all shadow-md"
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-amber-400 flex items-center justify-center transition-all shadow-md shrink-0"
                     >
                         {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
                     </button>
@@ -176,13 +205,15 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
                     {/* Daily Wheel Bonus Button */}
                     <button
                         onClick={() => setIsWheelOpen(true)}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-black transition-all shadow-sm"
+                        className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-black transition-all shadow-sm shrink-0"
+                        title="Spin Daily Wheel"
                     >
-                        <Trophy className="w-4 h-4 text-amber-400" />
-                        <span className="hidden sm:inline">Daily Wheel</span>
+                        <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400" />
+                        <span className="hidden md:inline">Daily Wheel</span>
                     </button>
 
-                    <nav className="hidden md:flex items-center gap-5 text-sm font-extrabold text-slate-300">
+                    {/* Desktop Nav Links */}
+                    <nav className="hidden xl:flex items-center gap-4 text-sm font-extrabold text-slate-300">
                         <Link href={route('home')} className="hover:text-amber-400 transition-colors">Home</Link>
                         <button
                             onClick={() => {
@@ -204,9 +235,9 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
 
                     {/* Authenticated User Actions vs Guest Buttons */}
                     {auth.user ? (
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3">
                             {/* Balance Pill & Buy Coins Button */}
-                            <div className="relative flex items-center bg-slate-900/90 rounded-2xl p-1.5 pl-3.5 border border-amber-500/30 shadow-lg">
+                            <div className="relative flex items-center bg-slate-900/90 rounded-xl sm:rounded-2xl p-1 sm:p-1.5 pl-2.5 sm:pl-3.5 border border-amber-500/30 shadow-lg">
                                 {/* Floating Coin Change Badge Animation */}
                                 <AnimatePresence>
                                     {balanceDiff && (
@@ -216,7 +247,7 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
                                             animate={{ opacity: 1, y: balanceDiff.amount > 0 ? -28 : 28, scale: 1.1 }}
                                             exit={{ opacity: 0, scale: 0.5 }}
                                             transition={{ duration: 0.4, type: 'spring', stiffness: 300 }}
-                                            className={`absolute left-3 px-2.5 py-0.5 rounded-full text-xs font-black font-mono shadow-2xl z-50 flex items-center gap-1 border pointer-events-none ${
+                                            className={`absolute left-2 sm:left-3 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-black font-mono shadow-2xl z-50 flex items-center gap-1 border pointer-events-none ${
                                                 balanceDiff.amount > 0
                                                     ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 text-white border-emerald-300 shadow-emerald-500/50'
                                                     : 'bg-gradient-to-r from-rose-600 to-rose-500 text-white border-rose-300 shadow-rose-500/50'
@@ -227,45 +258,43 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
                                     )}
                                 </AnimatePresence>
 
-                                <div className="flex items-center gap-2 mr-3">
-                                    <Coins className={`w-5 h-5 transition-transform duration-300 ${balanceDiff ? 'scale-125' : 'animate-pulse'} ${balanceDiff?.amount > 0 ? 'text-emerald-400' : (balanceDiff?.amount < 0 ? 'text-rose-400' : 'text-amber-400')}`} />
+                                <div className="flex items-center gap-1.5 sm:gap-2 mr-2 sm:mr-3">
+                                    <Coins className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 shrink-0 ${balanceDiff ? 'scale-125' : 'animate-pulse'} ${balanceDiff?.amount > 0 ? 'text-emerald-400' : (balanceDiff?.amount < 0 ? 'text-rose-400' : 'text-amber-400')}`} />
                                     <div>
-                                        <span className="text-[9px] uppercase font-black tracking-wider text-slate-400 block leading-none">Balance</span>
-                                        <span className={`font-black text-sm sm:text-base leading-none font-mono transition-colors duration-300 ${
+                                        <span className="text-[8px] sm:text-[9px] uppercase font-black tracking-wider text-slate-400 block leading-none hidden sm:block">Balance</span>
+                                        <span className={`font-black text-xs sm:text-sm md:text-base leading-none font-mono transition-colors duration-300 ${
                                             balanceDiff?.amount > 0
                                                 ? 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]'
                                                 : (balanceDiff?.amount < 0
                                                     ? 'text-rose-400 drop-shadow-[0_0_8px_rgba(251,113,133,0.8)]'
                                                     : 'text-amber-400')
                                         }`}>
-                                            {currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs font-sans text-amber-300">SC</span>
+                                            {currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] sm:text-xs font-sans text-amber-300">SC</span>
                                         </span>
                                     </div>
                                 </div>
-
 
                                 <Button
                                     variant="gold"
                                     size="sm"
                                     onClick={() => setIsStoreOpen(true)}
-                                    className="shadow-md"
+                                    className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-black shadow-md shrink-0"
                                 >
-                                    <PlusCircle className="w-4 h-4" />
-                                    <span>BUY COINS</span>
+                                    <PlusCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                    <span className="hidden sm:inline">BUY COINS</span>
                                 </Button>
                             </div>
-
 
                             {/* User Profile Dropdown */}
                             <div className="relative">
                                 <button
                                     onClick={() => setUserDropdown(!userDropdown)}
-                                    className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-all"
+                                    className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 transition-all"
                                 >
-                                    <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center font-black text-white text-xs shadow-md">
+                                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-purple-600 flex items-center justify-center font-black text-white text-xs shadow-md">
                                         {auth.user.name.charAt(0).toUpperCase()}
                                     </div>
-                                    <span className="text-sm font-extrabold text-white max-w-[90px] truncate hidden sm:inline">{auth.user.name}</span>
+                                    <span className="text-xs font-extrabold text-white max-w-[80px] truncate hidden md:inline">{auth.user.name}</span>
                                 </button>
 
                                 {userDropdown && (
@@ -297,11 +326,12 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
                             </div>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="flex items-center gap-1.5 sm:gap-2.5">
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => onOpenAuth('login')}
+                                className="px-2.5 sm:px-4 py-1 sm:py-1.5 text-xs font-extrabold"
                             >
                                 Login
                             </Button>
@@ -309,6 +339,7 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
                                 variant="gold"
                                 size="sm"
                                 onClick={() => onOpenAuth('register')}
+                                className="px-3 sm:px-4 py-1 sm:py-1.5 text-xs font-black shadow-md shadow-amber-500/20"
                             >
                                 Sign Up
                             </Button>
@@ -316,6 +347,61 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
                     )}
                 </div>
             </header>
+
+            {/* Expandable Mobile Search Bar Overlay */}
+            {isMobileSearchOpen && (
+                <div className="md:hidden fixed top-16 left-0 right-0 bg-slate-950/95 border-b border-slate-800 p-3 z-30 backdrop-blur-xl animate-fade-in shadow-2xl">
+                    <form onSubmit={handleSearchSubmit} className="relative flex items-center gap-2">
+                        <div className="relative flex-1">
+                            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <input
+                                type="text"
+                                autoFocus
+                                value={searchQuery || ''}
+                                onChange={handleSearchChange}
+                                placeholder="Search 3,200+ games..."
+                                className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                            />
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setIsMobileSearchOpen(false)}
+                            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white text-xs font-bold"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </form>
+
+                    {/* Mobile Autocomplete Results */}
+                    {searchResults.length > 0 && searchQuery && searchQuery.trim().length >= 2 && (
+                        <div className="mt-2 space-y-1 max-h-60 overflow-y-auto bg-slate-900 rounded-xl p-2 border border-slate-800">
+                            {searchResults.map(g => (
+                                <Link
+                                    key={g.id}
+                                    href={route('game.play', { slug: g.slug })}
+                                    onClick={(e) => {
+                                        setIsMobileSearchOpen(false);
+                                        if (!auth.user) {
+                                            e.preventDefault();
+                                            onOpenAuth('register');
+                                        }
+                                    }}
+                                    className="flex items-center justify-between p-2 hover:bg-slate-800 rounded-lg"
+                                >
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                        <img src={g.cover_image} alt={g.title} className="w-7 h-7 rounded object-cover" />
+                                        <div className="min-w-0">
+                                            <p className="text-xs font-black text-white truncate">{g.title}</p>
+                                            <p className="text-[10px] text-slate-400">{g.provider_code || 'GGR API'}</p>
+                                        </div>
+                                    </div>
+                                    <Badge variant="gold" className="text-[9px] px-2 py-0.5">PLAY</Badge>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Store Modal */}
             <StoreModal
@@ -342,3 +428,4 @@ export default function Header({ onOpenAuth, searchQuery, setSearchQuery }) {
         </>
     );
 }
+

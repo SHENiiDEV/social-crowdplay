@@ -220,7 +220,7 @@ export default function StoreModal({ isOpen, onClose, user, onBalanceUpdate, onO
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
                     transition={{ type: 'spring', stiffness: 120, damping: 18 }}
-                    className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 text-left overflow-hidden my-auto"
+                    className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-8 shadow-2xl space-y-5 sm:space-y-6 text-left max-h-[92vh] overflow-y-auto my-auto"
                 >
                     {/* Liquid Glass Highlight */}
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/50 to-transparent pointer-events-none" />
