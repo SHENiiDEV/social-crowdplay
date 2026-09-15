@@ -43,6 +43,10 @@ Route::prefix('legal')->name('legal.')->group(function () {
     Route::get('/privacy', [LegalController::class, 'privacy'])->name('privacy');
     Route::get('/aml-cft', [LegalController::class, 'aml'])->name('aml');
     Route::get('/responsible-gaming', [LegalController::class, 'responsibleGaming'])->name('responsible-gaming');
+    Route::get('/refund-policy', [LegalController::class, 'refund'])->name('refund');
+    Route::get('/sweepstakes-rules', [LegalController::class, 'sweepsRules'])->name('sweeps-rules');
+    Route::get('/cookie-policy', [LegalController::class, 'cookiePolicy'])->name('cookie-policy');
+    Route::get('/security-fair-play', [LegalController::class, 'security'])->name('security');
 });
 
 // Others Pages Routes

@@ -28,6 +28,26 @@ class LegalController extends Controller
         return Inertia::render('Legal/ResponsibleGaming');
     }
 
+    public function refund()
+    {
+        return Inertia::render('Legal/RefundPolicy');
+    }
+
+    public function sweepsRules()
+    {
+        return Inertia::render('Legal/SweepsRules');
+    }
+
+    public function cookiePolicy()
+    {
+        return Inertia::render('Legal/CookiePolicy');
+    }
+
+    public function security()
+    {
+        return Inertia::render('Legal/Security');
+    }
+
     public function contact()
     {
         return Inertia::render('Others/Contact');
