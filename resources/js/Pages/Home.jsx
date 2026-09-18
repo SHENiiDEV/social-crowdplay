@@ -3,7 +3,6 @@ import { Head, usePage, Link } from '@inertiajs/react';
 import MainLayout from '../Layouts/MainLayout';
 import { GameCard } from '../Components/Home/GameCard';
 import { HeroBanner } from '../Components/Home/HeroBanner';
-import { LiveFeed } from '../Components/Home/LiveFeed';
 
 import StoreModal from '../Components/Modals/StoreModal';
 import { JackpotWinModal } from '../Components/Modals/JackpotWinModal';
@@ -117,8 +116,6 @@ export default function Home({ games = [], currentCategory = 'All', categories =
             )}
 
             <HeroBanner initialJackpot={jackpotAmount} onOpenStore={() => setIsStoreOpen(true)} />
-
-            <LiveFeed />
 
             {/* ---------- Catalogue ---------- */}
             <div id="games-catalog" className="scroll-mt-24 sm:scroll-mt-28">
