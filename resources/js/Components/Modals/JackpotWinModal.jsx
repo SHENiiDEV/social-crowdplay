@@ -54,7 +54,7 @@ export function JackpotWinModal({ isOpen, onClose, winnerName = 'Player', amount
                         <div className="space-y-1">
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-black uppercase tracking-wider border border-amber-500/40">
                                 <Sparkles className="w-4 h-4" />
-                                <span>GRAND CASINO JACKPOT WINNER</span>
+                                <span>GRAND CASINO JACKPOT (SC) HIT</span>
                             </span>
                             <h2 className="text-3xl font-black text-white pt-2">CONGRATULATIONS, {winnerName.toUpperCase()}!</h2>
                         </div>

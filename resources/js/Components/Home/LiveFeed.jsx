@@ -79,10 +79,10 @@ export function LiveFeed() {
                                   style={{ animation: 'lux-pulse-dot 2s ease-in-out infinite' }} />
                             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-jade-400" />
                         </span>
-                        <span className="eyebrow">Live winners</span>
+                        <span className="eyebrow">Live activity</span>
                     </div>
                     <h2 className="mt-2 font-display text-2xl sm:text-3xl font-light text-white tracking-[-0.01em]">
-                        Live gameplay wins <em className="not-italic text-gold">right now</em>
+                        Community gameplay <em className="not-italic text-gold">activity</em>
                     </h2>
                 </div>
 
