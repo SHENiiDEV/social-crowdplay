@@ -499,7 +499,7 @@ export function DailyWheelModal({ isOpen, onClose, onBalanceUpdate }) {
                             WHEEL OF FORTUNE
                         </h2>
                         <p className="text-[11px] text-slate-500 font-medium">
-                            Spin daily for free Euro bonuses! 🎰
+                            Spin daily for free Social Coin (SC) bonuses! 🎰
                         </p>
 
                     </motion.div>

@@ -45,14 +45,14 @@ export default function RefundPolicy() {
                         <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl space-y-4">
                             <h2 className="text-lg font-black text-white flex items-center gap-2">
                                 <CreditCard className="w-5 h-5 text-amber-400" />
-                                <span>1. Digital Coin Purchases & Delivery</span>
+                                <span>1. Digital Coin Purchases & Transparent EUR Pricing</span>
                             </h2>
                             <div className="text-xs text-slate-300 leading-relaxed space-y-3">
                                 <p>
-                                    Social Coin bundles purchased through our Cashier / Store are delivered <strong className="text-white">instantly</strong> upon successful authorization by the payment processor (VISA, Mastercard, or approved gateway).
+                                    All Social Coin packages in our Store are presented with transparent pricing in Euros (€) and US Dollars ($). Real-money conversion costs and virtual coin quantities are explicitly displayed prior to checkout confirmation with zero hidden fees.
                                 </p>
                                 <p>
-                                    As digital goods delivered immediately upon checkout, customer rights to cancellation under statutory distance selling provisions expire as soon as the virtual service begins (i.e. coins are added to your balance).
+                                    Social Coin bundles are delivered <strong className="text-white">instantly</strong> upon successful authorization by the payment processor (VISA, Mastercard, or approved PCI DSS compliant gateway).
                                 </p>
                             </div>
                         </div>
@@ -61,16 +61,17 @@ export default function RefundPolicy() {
                         <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl space-y-4">
                             <h2 className="text-lg font-black text-white flex items-center gap-2">
                                 <RefreshCw className="w-5 h-5 text-cyan-400" />
-                                <span>2. Refund Eligibility & Exceptional Circumstances</span>
+                                <span>2. EU 14-Day Right of Withdrawal & Refund Terms</span>
                             </h2>
                             <div className="text-xs text-slate-300 leading-relaxed space-y-3">
                                 <p>
-                                    While standard purchases are non-refundable, {company?.name} will evaluate refund requests under the following verified conditions:
+                                    In accordance with European Union consumer protection directives (Directive 2011/83/EU on Consumer Rights):
                                 </p>
                                 <ul className="space-y-2 pl-4 list-disc text-slate-400">
-                                    <li><strong className="text-slate-200">Technical Billing Errors:</strong> Duplicate billing or accidental multiple charges caused by communication errors between payment gateways.</li>
-                                    <li><strong className="text-slate-200">Non-Delivery:</strong> Instances where funds were deducted from your bank or card, but virtual coins failed to credit within 2 hours after contacting support.</li>
-                                    <li><strong className="text-slate-200">Unauthorized Fraudulent Activity:</strong> Verified unauthorized card usage prior to any coin spending, subject to banking investigation and identity verification.</li>
+                                    <li><strong className="text-slate-200">14-Day Right of Withdrawal:</strong> EU consumers have the right to withdraw from a purchase within 14 calendar days without giving any reason, provided that the purchased virtual Social Coins remain <strong className="text-white">completely unused and unspent</strong> on any gameplay or slot spins.</li>
+                                    <li><strong className="text-slate-200">Consumption of Digital Content:</strong> When you purchase virtual coins and immediately commence playing games, you acknowledge that the digital service has begun, and the statutory right of withdrawal ceases for the consumed portion.</li>
+                                    <li><strong className="text-slate-200">Technical Billing Errors:</strong> Duplicate billing or accidental multiple charges caused by payment network latency are refunded automatically in full.</li>
+                                    <li><strong className="text-slate-200">Non-Delivery:</strong> If funds were deducted but virtual coins failed to credit to your balance, our support will resolve or refund within 24 hours.</li>
                                 </ul>
                             </div>
                         </div>

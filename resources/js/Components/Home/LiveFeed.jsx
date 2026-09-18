@@ -82,7 +82,7 @@ export function LiveFeed() {
                         <span className="eyebrow">Live winners</span>
                     </div>
                     <h2 className="mt-2 font-display text-2xl sm:text-3xl font-light text-white tracking-[-0.01em]">
-                        Payouts happening <em className="not-italic text-gold">right now</em>
+                        Live gameplay wins <em className="not-italic text-gold">right now</em>
                     </h2>
                 </div>
 

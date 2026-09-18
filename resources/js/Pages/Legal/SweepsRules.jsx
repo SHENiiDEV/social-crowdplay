@@ -20,9 +20,9 @@ export default function SweepsRules() {
                             <Trophy className="w-3.5 h-3.5 text-amber-400" />
                             <span>NO PURCHASE NECESSARY TO PLAY OR WIN</span>
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-black text-white">Official Sweepstakes & Free Entry Rules</h1>
+                        <h1 className="text-3xl md:text-4xl font-black text-white">Free-to-Play &amp; Promotional Entry Rules</h1>
                         <p className="text-xs md:text-sm text-slate-400 max-w-2xl">
-                            These Official Sweepstakes Rules govern the free participation, coin distribution, and promotional prize mechanisms operated by {company?.name}.
+                            These Rules govern the complimentary participation, daily coin rewards, and promotional virtual gameplay mechanisms operated by {company?.name}.
                         </p>
                     </div>
                 </div>
@@ -31,10 +31,10 @@ export default function SweepsRules() {
                 <div className="p-6 rounded-3xl border border-amber-500/30 bg-amber-500/5 space-y-3">
                     <div className="flex items-center gap-2.5 text-amber-400 font-extrabold text-sm uppercase tracking-wider">
                         <Gift className="w-5 h-5 shrink-0" />
-                        <span>Core Sweepstakes Principle: No Purchase Required</span>
+                        <span>Core Principle: 100% Free to Play with No Purchase Required</span>
                     </div>
                     <p className="text-xs text-slate-300 leading-relaxed">
-                        <strong className="text-white">NO PURCHASE OR PAYMENT OF ANY KIND IS NECESSARY TO ENTER OR WIN.</strong> A purchase does not increase your chances of winning. Sweepstakes entries (Social Coins / SC) are freely available via standard daily login bonuses, the Daily Fortune Wheel, referral rewards, and written mail-in request.
+                        <strong className="text-white">NO PURCHASE OR PAYMENT OF ANY KIND IS NECESSARY TO PARTICIPATE OR PLAY.</strong> A purchase does not increase your chances of winning. Virtual Social Coins (SC) awarded through promotions have zero real-world monetary value, cannot be redeemed for cash or physical prizes, and are intended solely for entertainment.
                     </p>
                 </div>
 

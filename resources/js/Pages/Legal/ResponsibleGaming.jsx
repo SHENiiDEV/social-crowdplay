@@ -54,16 +54,28 @@ export default function ResponsibleGaming() {
                     </div>
                 </div>
 
-                {/* Self Exclusion Request Box */}
-                <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl space-y-4">
-                    <h2 className="text-lg font-black text-white flex items-center gap-2">
-                        <AlertCircle className="w-5 h-5 text-emerald-400" />
-                        <span>Request Account Self-Exclusion</span>
-                    </h2>
-                    <p className="text-xs text-slate-300 leading-relaxed">
-                        If you would like to pause your access to {company?.name}, simply email our dedicated Player Safety team at <a href={`mailto:${company?.email}`} className="text-emerald-400 font-bold hover:underline">{company?.email}</a> with the subject line <strong>"Self-Exclusion Request"</strong>.
-                        Your account will be instantly closed, and coin purchases will be blocked.
-                    </p>
+                {/* Protection of Minors & Self Exclusion */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl space-y-4">
+                        <h2 className="text-lg font-black text-white flex items-center gap-2">
+                            <Lock className="w-5 h-5 text-amber-400" />
+                            <span>Protection of Minors (18+ Policy)</span>
+                        </h2>
+                        <p className="text-xs text-slate-300 leading-relaxed">
+                            {company?.name} strictly prohibits individuals under 18 years of age from registering or playing. We enforce strict age-gating mechanisms and apply zero direct marketing or commercial pressure towards children or minors to purchase virtual tokens.
+                        </p>
+                    </div>
+
+                    <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl space-y-4">
+                        <h2 className="text-lg font-black text-white flex items-center gap-2">
+                            <AlertCircle className="w-5 h-5 text-emerald-400" />
+                            <span>Request Account Self-Exclusion</span>
+                        </h2>
+                        <p className="text-xs text-slate-300 leading-relaxed">
+                            If you would like to pause your access to {company?.name}, simply email our dedicated Player Safety team at <a href={`mailto:${company?.email}`} className="text-emerald-400 font-bold hover:underline">{company?.email}</a> with the subject line <strong>"Self-Exclusion Request"</strong>.
+                            Your account will be instantly closed, and coin purchases will be blocked.
+                        </p>
+                    </div>
                 </div>
             </div>
         </MainLayout>

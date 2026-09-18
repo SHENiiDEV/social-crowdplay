@@ -34,7 +34,7 @@ export default function Aml() {
                             <span>1. Social Casino Security Monitoring</span>
                         </h2>
                         <p>
-                            Although {company?.name} is a <strong>Social Casino platform operating with virtual Social Coins (SC)</strong> and does not offer real money payouts, we strictly monitor all payment transactions for fraudulent activity.
+                            {company?.name} operates strictly as a <strong>free-to-play Social Casino with virtual Social Coins (SC)</strong>. The platform does not offer real-money gambling, cash payouts, or prize redemptions. Nevertheless, we maintain robust anti-fraud and transaction monitoring to protect customers and payment processing channels.
                         </p>
                     </div>
 

@@ -83,14 +83,14 @@ export default function Terms() {
                         <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl space-y-4">
                             <h2 className="text-lg font-black text-white flex items-center gap-2">
                                 <RefreshCw className="w-4 h-4 text-purple-400" />
-                                <span>3. Store Purchases & Payment Terms</span>
+                                <span>3. Store Purchases, Transparent Pricing & EU Withdrawal Rights</span>
                             </h2>
                             <div className="text-xs text-slate-300 leading-relaxed space-y-3">
                                 <p>
-                                    Players may optionally purchase additional Social Coin packages in our Store / Cashier using accepted payment methods (Credit Cards, Stripe, Crypto).
+                                    Players may optionally purchase additional Social Coin packages in our Store with transparent pricing clearly displayed in Euros (€) or US Dollars ($) with full pre-purchase disclosures.
                                 </p>
                                 <p className="text-slate-400">
-                                    All purchases are final and non-refundable once virtual Social Coins have been credited to your account.
+                                    In accordance with EU consumer protection regulations, users retain a 14-day statutory right of withdrawal for any virtual coin package, provided the coins remain completely unspent. Once virtual coins have been consumed on game sessions or slot spins, all purchases are non-refundable.
                                 </p>
                             </div>
                         </div>
@@ -99,14 +99,15 @@ export default function Terms() {
                         <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl space-y-4">
                             <h2 className="text-lg font-black text-white flex items-center gap-2">
                                 <Scale className="w-4 h-4 text-emerald-400" />
-                                <span>4. Fair Play & Prohibited Conduct</span>
+                                <span>4. Strict Prohibition of Secondary Markets & Trading</span>
                             </h2>
                             <div className="text-xs text-slate-300 leading-relaxed space-y-2">
-                                <p>The following activities are strictly prohibited and will result in immediate account termination:</p>
+                                <p>To maintain our 100% free-to-play social entertainment status, the following activities are strictly prohibited and will result in immediate permanent account termination:</p>
                                 <ul className="space-y-1.5 pl-4 list-disc text-slate-400">
-                                    <li>Using automated bots, scripts, or exploits to gain coins unfairly.</li>
-                                    <li>Engaging in harassment or abusive behavior towards support or other players.</li>
-                                    <li>Attempting to sell or trade Social Coins outside the platform.</li>
+                                    <li>Selling, buying, trading, or transferring Social Coins or player accounts on third-party platforms for real money.</li>
+                                    <li>Attempting to redeem, cash out, or exchange virtual Social Coins for real currency or physical prizes.</li>
+                                    <li>Using automated bots, scripts, or exploits to generate coins unfairly.</li>
+                                    <li>Allowing minors under 18 years of age to access or play on the platform.</li>
                                 </ul>
                             </div>
                         </div>

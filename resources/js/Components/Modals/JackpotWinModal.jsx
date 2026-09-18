@@ -60,14 +60,14 @@ export function JackpotWinModal({ isOpen, onClose, winnerName = 'Player', amount
                         </div>
 
                         <div className="py-4 bg-slate-950/80 rounded-2xl border border-amber-500/40 shadow-inner">
-                            <span className="text-xs uppercase font-black text-slate-400 block mb-1">JACKPOT PRIZE PAYOUT</span>
+                            <span className="text-xs uppercase font-black text-slate-400 block mb-1">GRAND JACKPOT (SC) AWARDED</span>
                             <span className="text-4xl font-black font-mono text-amber-400 tracking-tight drop-shadow-[0_4px_20px_rgba(251,191,36,0.4)]">
                                 +{Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2 })} SC
                             </span>
                         </div>
 
                         <p className="text-xs text-slate-300 font-medium leading-relaxed">
-                            The Grand Progressive Jackpot was triggered! The prize has been credited directly to your SC wallet.
+                            The Grand Progressive Jackpot was triggered! The virtual SC coins have been credited directly to your balance.
                         </p>
 
 
@@ -77,7 +77,7 @@ export function JackpotWinModal({ isOpen, onClose, winnerName = 'Player', amount
                             onClick={onClose}
                             className="w-full shadow-2xl shadow-amber-500/30"
                         >
-                            COLLECT JACKPOT PRIZE
+                            COLLECT JACKPOT (SC)
                         </Button>
                     </div>
                 </motion.div>
